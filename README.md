@@ -1,10 +1,10 @@
-# Medina
+# Medina #
 An attempt to utilize machine learning to play the board game Medina
 
-## The game
-*Media* is a board game published by Stronghold Games 
-[more information here](https://boardgamegeek.com/boardgame/167270/medina-second-edition) 
-[official website for game](https://strongholdgames.com/store/board-games/medina/)
+## The Game ##
+*Media* is a board game published by Stronghold Games (
+[more information here](https://boardgamegeek.com/boardgame/167270/medina-second-edition), 
+[official website for game](https://strongholdgames.com/store/board-games/medina/) )
 and designed by Stefan Dorra. I claim to have no ownership of the game and this 
 project is only an attempt to use machine learning to play the game.
 
@@ -51,7 +51,7 @@ the position and elements around the building (walls, the well, merchants and
 stables all give additional points). For the full rules and scoring of the game, 
 view [this pdf](http://www.boardspace.net/medina/english/WGG_Medina_Rules_GB_Web.pdf)
 
-##Objective
+## Objective ##
 My objective is this project is to:
 *Implement the game in Python with a GUI interface and allow players to play 
 the game.
@@ -65,11 +65,11 @@ a decent score.
 *Possibly develop different versions of the AI that can play the game with 
 different strategies (aggressive, risky, impatient) and difficulty.
 
-##Purpose
+## Purpose ##
 This project is the project I will be doing as part of my Programming Python 
-course at UC Fall Semester 2016.
+course at The Univeristy of Cincinnati Fall Semester 2016.
 
-##Time frame
+## Time Frame ##
 *This is subject to change as many aspects of the scope and design may change 
 as the project progresses*
 
@@ -98,6 +98,6 @@ play a game to completion and play over a network.
 _November 30th_: The game should be completed with an AI implementation that 
 can sucesfully play the game and consistantly obtain a decent score.
 
-##Copyright
+### Copyright ###
 This code is under the MIT License Copyright (c) 2016 Nicholas Maltbie. See 
 LICENSE.txt for further details.
