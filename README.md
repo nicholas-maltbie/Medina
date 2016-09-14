@@ -28,15 +28,16 @@ building of each color or no more actions can be taken, the game ends.
 
 A player can place any two or two of the same pieces from the following list on 
 each of their turns:
-1. _Buildings_ : can be used to start a new building or grow an existing, 
+
+ 1. _Buildings_ : can be used to start a new building or grow an existing, 
 unclaimed building. Four colors of buildings: Grey, Brown, Orange and Purple.
-2. _Rooftops_ : can be used to claim an unclaimed building currently on the 
+ 2. _Rooftops_ : can be used to claim an unclaimed building currently on the 
 board. A player can only own one of each color building.
-3. _Stables_ : can be attached to an existing claimed building and grows the 
+ 3. _Stables_ : can be attached to an existing claimed building and grows the 
 building for purposes of ardency and scoring.
-4. _Merchant_ : merchants build in a claim across the board and award extra 
+ 4. _Merchant_ : merchants build in a claim across the board and award extra 
 points to buildings that the merchants are next to.
-5. _Walls_ : walls are built around the edge of the board growing out from 
+ 5. _Walls_ : walls are built around the edge of the board growing out from 
 towers at the corners. Walls that are adjacent to buildings award extra points 
 to the building for each wall touching the building. 
 
@@ -53,16 +54,16 @@ view [this pdf](http://www.boardspace.net/medina/english/WGG_Medina_Rules_GB_Web
 
 ## Objective ##
 My objective is this project is to:
-*Implement the game in Python with a GUI interface and allow players to play 
+* Implement the game in Python with a GUI interface and allow players to play 
 the game.
-*Make the game a network game so multiple players could play the same game on 
+* Make the game a network game so multiple players could play the same game on 
 different machines.
-*Add an AI to the game that utilizes machine learning and pattern recognition 
+* Add an AI to the game that utilizes machine learning and pattern recognition 
 to make moves and become better at playing the game as time goes on.
-*Give the AI the ability to watch and learn from records of games.
-*Train the AI to the point in which it can consistently play the game and get 
+* Give the AI the ability to watch and learn from records of games.
+* Train the AI to the point in which it can consistently play the game and get 
 a decent score.
-*Possibly develop different versions of the AI that can play the game with 
+* Possibly develop different versions of the AI that can play the game with 
 different strategies (aggressive, risky, impatient) and difficulty.
 
 ## Purpose ##
@@ -79,23 +80,28 @@ should be logged in a fiel in the repo*
 The game should be at least implement with a partially functional GUI by October 
 1st 2016 (Marks the start of the project)
 
-_Two weeks in_ (Oct 15th): The game should be fully implemented - the rules 
-should be implemented, the game should be able to score the board, multiple 
-players should be able to play the game on one machine.
+_Two weeks in_ (Oct 15th): 
+- The game should be fully implemented:
+* the rules should be implemented, the game should be able to score the board.
+* multiple players should be able to play the game on one machine.
 
-_Four weeks in_ (Oct 29th): The game should be fully implemented over a network 
+_Four weeks in_ (Oct 29th): 
+- The game should be fully implemented over a network 
 - human players can join the game. A _JOSN_ format should be used to: manage all 
 actions of players in the game, announce game start, and determine the winner.
 
-_Six weeks in_ (Nov 12th): An AI library should be selected and a plan written 
-of how to implement an AI in the game. This inclues benchmarking completed for 
-designing the AI and similar AI for playing board games or pattern recognition. 
-A new time frame should also be made by this point.
+_Six weeks in_ (Nov 12th): 
+- An AI library should be selected and a plan written of how to implement an AI 
+in the game. This inclues benchmarking completed for designing the AI and 
+similar AI for playing board games or pattern recognition. 
+- A new time frame should also be made by this point.
 
-_Eight weeks in_ (Nov 26th): The AI should be implemented with the ability to 
-play a game to completion and play over a network.
+_Eight weeks in_ (Nov 26th): 
+- The AI should be implemented with the ability to play a game to completion 
+and play over a network.
 
-_November 30th_: The game should be completed with an AI implementation that 
+_November 30th_: 
+- The game should be completed with an AI implementation that 
 can sucesfully play the game and consistantly obtain a decent score.
 
 ### Copyright ###
