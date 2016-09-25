@@ -75,7 +75,7 @@ course at The Univeristy of Cincinnati Fall Semester 2016.
 as the project progresses*
 
 *All code should be documented as the project is made and plans to make changes 
-should be logged in a fiel in the repo*
+should be logged in a file in the repo*
 
 The game should be at least implement with a partially functional GUI by October 
 1st 2016 (Marks the start of the project)
