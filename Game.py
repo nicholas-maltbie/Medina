@@ -4,40 +4,35 @@ game and can be refrenced by other parts of the project.
 Different parts of the game include:
     - Board
     - Players
-    - Tiles"""
+    - Tiles
+"""
+
+import random
+
+def make_board(rows, columns):
+    """Creates a dictionary of the board and rooftops played.
     
-BUILDINGS_COLORS = ['G', 'V', 'B', 'O']
-"""Colors for different buildings: Grey, Violet, Brown, Orange""" 
-BUILDINGS_COLORS_HEX = {'G': 'E2E2E2', 
-                        'V': 'A70BAC',
-                        'B': '4E2E03',
-                        'O': 'FFD500'}
-"""Colors of the buildings in HEX color codes, RRGGBB"""
-    
-def class Board:
-    """A board is the general area where all players take actions. 
-    
+    A board is the general area where all players take actions. 
+
     The board is a grid that has space for buildings, merchants and walls to be 
     placed on the board. Buildings and merchants are in the same space so their 
     data will be saved in a 2D array of characters where a code will correspond 
-    to what each character means. Rooftops are placed above buildings and there 
-    are less used in the game so they will just be saved as a separate 
-    dictionary where each player is a reference and each value is a list of 
-    tuples that contain the (row, column) for the rooftop location that the 
-    player has placed.
-    
+    to what each character means. Rooftops are placed above buildings and hence 
+    will be saved separate from the board. The board is saved under the key of 
+    'board' and each player is saved under the key of 'p_%name%', where %name% is 
+    the name of the player. 
+
     Large game (3 or 4 players)
         board size is 11 x 16       (13 x 18 with walls)
     Small game (2 players)
         board size is 10 x 14       (12 x 16 with walls)
-    
-    Rooftop Dictionary Example:
-        {'player1_name' : [(0, 1), (6, 4)],
-         'player2_name' : [(10, 5)],
-         'player3_name' : [],
-         'player4_name' : [(13, 3)]
-        }
-    
+
+    Rooftop Example:
+        'p_name' : [(0, 1), (6, 4)],
+        'p_name2' : [(10, 5)],
+        'p_name3' : [],
+        'p_name4' : [(13, 3)]
+
     Character Code Key:
         'e' = empty
         'l' = wall location     (not constructed)
@@ -47,7 +42,7 @@ def class Board:
         't' = tower             (One at each corner)
         'm' = merchant          (builds in a chain)
         Building color character codes.
-    
+
     Example of Saved Buildings and walls:
         
         New Game:
@@ -75,125 +70,110 @@ def class Board:
         w e R R R R e e e e e e e e e e e l
         t w w w w l l l l l l l l l l l l t
     
-
-    Attributes:
-        board: BD array of characters to store walls, buildings and merchants.
-        rooftops: Dictionary of rooftops played saved as
-            playernames: [rooftop locations].
-        get_large_board: Gets a board for a three or four player game.
-        get_small_board: Gets a board for a four of five player game.
-        num_rows: Gets the number of rows of the board.
-        num_cols: Gets the number of columns of the board.
+    Args:
+        rows: Number of rows for buildings.
+        columns: Number of columns for buildings.
+        
+    Raises:
+        AssertionError: rows and columns must both be integers greater than 
+            zero to create a board.
     """
+    assert type(rows) == int, "Rows is not an integer, %r" % rows
+    assert type(columns) == int, "Column is not an integer %r" % columns
+    assert rows > 0, "Row must be greater than zero %r" % rows
+    assert columns > 0, "Columns must be greater than zero %r" % columns
     
-    NEUTRAL_PLAYER = ""
-    """Name of the neutral player for 2 and 3 player games."""
+    places = [list(TOWER + WALL_LOCATION * columns + TOWER)]
+    for i in range(0, rows):
+        places.append(list(WALL_LOCATION + EMPTY * columns + WALL_LOCATION))
+    places.append(list(WALL_LOCATION + WALL_LOCATION * columns + TOWER))
     
-    EMPTY = 'e'
-    WALL_LOCATION = 'w'
-    WALL = 'c'
-    STABLE = 's'
-    WELL = 'w'
-    TOWER = 't'
-    MERCHANT = 'm'
-    
-    def get_large_board(player_names):
-        """Generates and returns a board for a game with three or four players
-        
-        Args:
-            player_names: List of player names."""
-        return Board(player_names)
-    
-    def get_small_board(player_names):
-        """Generates and returns a board for a game with B players
-        
-        Args:
-            player_names: List of player names."""
-        return Board(10, 14, player_names)
-    
-    def __init__(self, rows = 11, columns = 16, player_names):
-        """Creates a board and dictionary to store rooftops
-        
-        This will generate a BD array for the number of rows + B and the number 
-        of columns + B to allow space for the board and two more spaces for the 
-        walls and towers on each edge of the board.
-        
-        Args:
-            rows: Number of rows for buildings.
-            columns: Number of columns for buildings.
-            player_names: List of player names.
-            
-        Raises:
-            AssertionError: rows and columns must both be integers greater than 
-                zero to create a board.
-        """
-        assert type(rows) == int, "Rows is not an integer, %r" % rows
-        assert type(columns) == int, "Column is not an integer %r" % columns
-        assert rows > 0, "Row must be greater than zero %r" % rows
-        assert columns > 0, "Columns must be greater than zero %r" % columns
-        
-        self.rows = rows;
-        self.columns = columns;
-        
-        self.board = [list(TOWER + WALL_LOCATION * columns + TOWER)]
-        for i in range(0, rows):
-            self.board.append(list(WALL_LOCATION + EMPTY * columns + WALL_LOCATION))
-        self.board.append(list(WALL_LOCATION + WALL_LOCATION * columns + TOWER))
-        
-        self.rooftops = {}
-        
-        for name in player_names:
-            roofotps[name] = []
-        rooftops[NEUTRAL_PLAYER] = []
-        
-    def __getitem__(self, (row, column)):
-        """Gets an element from the board at a specified row and column.
-        
-        Args:
-            (row, column): Row and columon of element to check
-            
-        Returns:
-            The element located at the position of (row, column)
-            
-        Raises:
-            AssertionError: row and column must both be non-negative integers.
-        """
-        assert type(row) == int, "Row is not an integer, %r" % row
-        assert type(column) == int, "Column is not an integer %r" % column
-        assert row >= 0, "Row must be a non-negative number %r" % row    
-        assert column >= 0, "Column must be a non-negative number %r" % column
-        return self.board[row][column]
-    
-    def __setitem__(self, (row, column), element):
-        """Sets an element at a specified location.
-        
-        Args:
-            row: Row and Column of element to set
-            element: Value to place into position (row, column)
-        
-        Returns:
-            The element that was previously at the location row, column.
-            
-        Raises:
-            AssertionError: row and column must both be non-negative integers.
-        """
-        assert type(row) == int, "Row is not an integer, %r" % row
-        assert type(column) == int, "Column is not an integer %r" % column
-        assert row >= 0, "Row must be a non-negative number %r" % row    
-        assert column >= 0, "Column must be a non-negative number %r" % column
-        temp = self.get(row, column)
-        self.board[row][column] = element;
-        return temp;
-  
-    def num_rows(self):
-        """Gets the number of rows of this board (including the walls)"""
-        return self.rows
-    
-    def num_columns(self):
-        """Gets the number of columns of this board (including the walls)"""
-        return self.columns
+    return {'board': places, 'p_' + NEUTRAL_PLAYER:[]}
 
-def class Player:
+def get_large_board():
+    """Generates and returns a board for a game with three or four players
+    
+    Args:
+        player_names: List of player names."""
+    return make_board(11, 16)
+
+def get_small_board(player_names):
+    """Generates and returns a board for a game with B players
+    
+    Args:
+        player_names: List of player names."""
+    return Board(rows=10, columns=14)
+
+def get_game_board(board):
+    """Gets the game board element of a board."""
+    return board['board']
+
+def get_board_element(board, row, column):
+    """Gets an element at a specified location of a board."""
+    return get_game_board(board)[row][column]
+
+def is_space_empty(board, row, column):
+    """Checks if a location on a board is empty."""
+    return get_board_element(board, row, column) == EMPTY
+
+def set_board_element(board, row, column, element):
+    """Sets an element at a specified location of a board."""
+    before = get_board_element(board, row, column)
+    get_game_board(board)[row][column] = element;
+    return before
+
+def place_well(board):
+    """Places the well in a board and then returns the row and column of the 
+    location in which the well was placed."""
+    game_board = get_game_board(board)
+    row_range, column_range = len(board) - 2, len(board[0]) - 2
+    location = (random.randrange(row_range), random.randrange(column_range))
+    set_board_element(board, location[0], location[1], WELL)
+    return location
+
+def get_played_rooftops(board, player):
+    """Gets the rooftops played by the player as a list of locations saved in 
+    the format of [(row, column), (row, column), ...]. An empty list means the 
+    player has not played any rooftops."""
+    ref = 'p_' + player.name
+    if not ref in board:
+        return []
+    return board[ref]
+
+def get_num_played_rooftops(board, player):
+    """Gets the number of rooftops the player has played."""
+    return len(get_played_rooftops(board, player))
+
+def play_rooftop(board, player, row, column):
+    """Plays a rooftop on the board for a player. If the player has not played 
+    any rooftops yet, a new key pair will be added to the board reffering to the 
+    player and a new empty list of rooftops."""
+    ref = 'p_' + player.name
+    if not ref in board:
+        board[ref] = []
+    board[ref].append((row, column))
+
+BUILDINGS_COLORS = ['G', 'V', 'B', 'O']
+"""Colors for different buildings: Grey, Violet, Brown, Orange""" 
+BUILDINGS_COLORS_HEX = {'G': 'E2E2E2', 
+                        'V': 'A70BAC',
+                        'B': '4E2E03',
+                        'O': 'FFD500'}
+"""Colors of the buildings in HEX color codes, RRGGBB"""
+
+NEUTRAL_PLAYER = ""
+"""Name of the neutral player for 2 and 3 player games."""
+
+#Code for the different kinds of locations within a board
+EMPTY = 'e'
+WALL_LOCATION = 'w'
+WALL = 'c'
+STABLE = 's'
+WELL = 'w'
+TOWER = 't'
+MERCHANT = 'm'
+
+class Player:
     """A Player needs to be able to hold pieces and have a name.
     
     A player plays games in medina and is responsible to hold peices and be 
@@ -235,7 +215,7 @@ def class Player:
             num_players: Number of players in the game."""
         self.name = name
         self.buildings = {};
-        for color : BUILDINGS_COLORS:
+        for color in BUILDINGS_COLORS:
             buildings[color] = buildings_given[num_players]
         stables = stables_given[num_players]
         rooftops = rooftops_given[num_players]
@@ -243,7 +223,7 @@ def class Player:
         merchants = merchants_given[num_players]
         walls = walls_given[num_players]
     
-def class Tile:
+class Tile:
     """Define different kinds of tiles here and describe. Tiles should be held 
     by players in the game
     
@@ -271,7 +251,7 @@ def class Tile:
         
     def get_tea_tiles():
         """Gets all the tea tiles in the game"""
-        return [Tile(TEA_TILE), for i in range(6)]
+        return [Tile(TEA_TILE) for i in range(6)]
     
     TEA_TILE = 'TEA'
     TOWER_TILE = 'TOW'
@@ -282,7 +262,7 @@ def class Tile:
         3:BUILDINGS_COLORS[2],
         4:BUILDINGS_COLORS[3]}
     
-    def __init__(self, type, value=0)
+    def __init__(self, type, value=0):
         """Creates a player with a given properties.
         
         Args:
