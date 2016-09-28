@@ -13,9 +13,15 @@ Tiles are saved as a dictionary of either two or three elements.
 type: Type of tile, Tea, Tower, or Palace.
 value: Point value of the tile.
 merchants: Only for Tower tiles, the number of merchants left on the 
-    tile for players to pickup."""
+    tile for players to pickup.
 
 
+>>> tile = make_tile(TEA_TILE)
+>>> get_tile_type(tile)
+'TEA'
+>>> get_tile_value(tile)
+0
+"""
 
 BUILDINGS_COLORS = ['Grey', 'Violet', 'Brown', 'Orange']
 """Colors for different buildings: Grey, Violet, Brown, Orange""" 
@@ -56,7 +62,16 @@ def get_tile_value(tile):
 
 def get_num_merchants(tile):
     """Gets the number of merchants on a tile. If the tile does not have a 
-    merchants field, this will raise an exception."""
+    merchants field, this will raise an exception.
+    
+    >>> tile = make_tile(TOWER_TILE, 3)
+    >>> get_tile_type(tile)
+    'TOW'
+    >>> get_tile_value(tile)
+    3
+    >>> get_num_merchants(tile)
+    1
+    """
     assert 'merchants' in tile
     return tile['merchants']
 
@@ -74,6 +89,8 @@ def take_merchants(tile):
     return num
 
 def make_tile(type, value=0):
+    """This function will make and return a tile of a given type and score. If 
+    the type is  merchant, merchants will be added to the tile."""
     tile = dict()
     tile['type'] = type
     tile['value'] = value
