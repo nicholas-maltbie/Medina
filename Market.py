@@ -20,6 +20,32 @@ market street is also restricted by the old market street(s).
 
 from Location import *
 
+def make_market(start):
+    """This function will make a market which is the list of all the market 
+    streets of merchants there are in the game."""
+    market = [];
+    market.append(make_market_street(start));
+    return market;
+
+def contains_location(market, loc):
+    """Checks if a market contains a specific location in any of its streets."""
+    for street in market:
+        if loc in street:
+            return True
+    return False
+
+def get_num_streets(market):
+    """Gets the number of streets in a market."""
+    return len(market)
+    
+def add_market_street(market, start):
+    """Adds a new market street to a market and sets it as the active street."""
+    market.append(make_market_street(start))
+
+def get_active_market_street(market):
+    """Gets the active street in a market."""
+    return  market[-1]
+
 def make_market_street(start):
     """This function will make a market street which is a saved list of 
     locations that represents merchants placed on the board."""
@@ -33,13 +59,34 @@ def add_merchant(street, merchant):
     """Adds a merchant to a market street."""
     street.append(merchant)
 
-def get_possible_addition(street, other_streets):
+def get_adjacent_to_street(street):
+    """Gets all locations orthogonally adjacent to a street."""
+    adj = set()
+    for loc in street:
+        adj.update(get_orthogonal(loc))
+    return adj.difference_update(street)
+
+def is_valid_location(loc, market):
+    """This checks if a location is a valid place to add a merchant for a given 
+    market. A place is considered valid if it is attached to a spot adjacent to 
+    the head or tail of the market street and only has 1 neighbor upon being 
+    placed."""
+    return loc in get_possible_addition(market)
+
+def get_possible_addition(market):
     """Gets the possible locations to add merchants to the market street. This 
     must account for other streets as merchatns can only be played in a location
     where they would only have one other merchant adjacent to them; no loops 
     allowed. This includes other streets. These locations branch from the head 
     and tail of a market street."""
-    pass
+    possible = set()
+    addition = set()
+    for end in get_head_and_tail(get_active_market_street(market)):
+        possible.update(get_orthogonal(end))
+        addition.update(get_orthogonal(end))
+    possible.difference_update(get_active_market_street(market))
+    possible.difference_update(get_adjacent_to_market(market))
+    return possible
 
 def get_head_and_tail(street):
     """Gets the head and tail of a street. The head and tail are locations on 

@@ -10,4 +10,5 @@ off them, and a well.
 from Player import *
 from Location import *
 from Building import *
-
+from Market import *
+from Tower import *
