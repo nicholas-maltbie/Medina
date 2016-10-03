@@ -34,7 +34,7 @@ def get_stable_locations(building):
     """Gets all the stables attached to a building"""
     return building['stables']
 
-def contains_location(building, location):
+def buidling_contains_location(building, location):
     """Checks if a location is part of the building"""
     return location in get_building_locations(building)
 

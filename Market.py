@@ -27,7 +27,7 @@ def make_market(start):
     market.append(make_market_street(start));
     return market;
 
-def contains_location(market, loc):
+def market_contains_location(market, loc):
     """Checks if a market contains a specific location in any of its streets."""
     for street in market:
         if loc in street:
