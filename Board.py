@@ -176,8 +176,8 @@ def get_merchant_place_locations(board):
     possible = get_all_locations(board)
     #Remove currently occupied locations and locations next to the streets.
     for street in market:
-        possible -= set(street);
-        possible -= set(get_adjacent_to_street(street)
+        possible -= set(street)
+        possible -= set(get_adjacent_to_street(street))
     for building in get_buildings(board):
         possible -= set(get_building_and_stables(building))
     possible.remove(get_well(board))
@@ -222,7 +222,6 @@ def get_num_merchants_adjacent_to_building(board, building):
     """Gets the number of merchants orthogonally adjacent to a given buidling."""
     merchant_locations = get_wall_locations(get_towers(board))
     count = 0
-    merc
     orthogonal = get_building_stable_othogonal(building)
     for merchant in merchant_locations:
         if merchant in orthogonal:
@@ -233,4 +232,11 @@ def get_connected_towers(board, building):
     """Gets the tower numbers that a building is connected to. Tower's are 
     numbered 1 through 4 each worth different points and has a different 
     associated tile."""
-    pass    #FINISH THIS METHOD
+    def is_connected_to_tower(tower_number, orthogonal):
+        tower_walls = get_wall_locations_for_tower(get_towers(board), tower_number)
+        for wall in tower_walls:
+            if wall in orthogonal:
+                return True
+        return False
+    orthogonal = get_building_stable_othogonal(building)
+    return [num for num in range(1, 5) if is_connected_to_tower(num, orthogonal)]
