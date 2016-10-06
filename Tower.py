@@ -8,6 +8,8 @@ tower is saved as its value and the length of the walls streching out from
 each side of the tower. Additionally, the towers must know the length and the 
 columns of the board so there is always room for a gate."""
 
+from location import *
+
 def make_towers(rows, columns):
     """This method will make a the towers for a game with the towers 
     numbered 1, 2, 3, and 4."""
@@ -21,6 +23,24 @@ def get_columns(towers):
     """Gets the columns of the board for towers."""
     return towers['columns']
 
+def get_wall_locations(towers):
+    """Gets the locations of all walls attached to the towers. The wall locations 
+    are outside of the bounds of the board, they will strech from -1 to the number
+    of rows and the number of columns."""
+    walls = []
+    for num in range(4):
+        tower = get_tower(towers, num)
+        row_mod = (-1) ** (num // 2)
+        row_offset = -row_mod
+        col_mod = (-1) ** (num % 2)
+        col_offset = -col_mod
+        start = make_location(num // 2 * get_rows(towers) + row_offset, num % 2 * get_columns(towers) + col_offset)
+        for wall in range(get_tower_wall_h(tower)):
+            walls.append(make_location(get_translate(start, 0, col_mod * (wall + 1))))
+        for wall in range(get_tower_wall_v(tower)):
+            walls.append(make_location(get_translate(start, row_mod * (wall + 1), 0)))
+    return walls
+
 def get_structures(towers):
     """Gets the list of towers from a tower structure made by make_towers"""
     return towers['towers']
@@ -29,6 +49,14 @@ def get_tower(towers, tower_number):
     """Gets a tower of a specific number from towers"""
     assert 1 <= tower_number <= 4
     return get_structures(towers)[tower_number - 1]
+
+def add_tower_r(tower):
+    """Adds one to a tower's row size."""
+    tower['builtV'] += 1
+
+def add_tower_c(tower):
+    """Adds one to a tower's column size."""
+    tower['builtH'] += 1;
 
 def can_add_c(towers, tower_number):
     """Checks if an addition can be made to a tower on the horizontal wall. 

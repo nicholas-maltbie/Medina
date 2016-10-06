@@ -31,12 +31,25 @@ def attach_building_locations(building, location):
     get_building_locations(building).append(location)
 
 def get_stable_locations(building):
-    """Gets all the stables attached to a building"""
+    """Gets all the stables attached to a building."""
     return building['stables']
 
 def buidling_contains_location(building, location):
-    """Checks if a location is part of the building"""
+    """Checks if a location is part of the building."""
     return location in get_building_locations(building)
+
+def get_building_and_stables(building):
+    """Gets all the building and stable locations of a building in a single list."""
+    return get_stable_locations(building) + get_building_locations(building)
+
+def buliding_contans_location_stables(building, location):
+    """Checks if a building or it's attached stables contains a location."""
+    return locaiton in get_building_locations(building) or location in get_stable_locations(building)
+
+def get_building_peice_attach(building):
+    """Gets all the locations that building peices can be attached, this is the 
+    list of orthogonal location excluding those occupied by stables."""
+    return get_building_orthogonal(building) - get_stable_locations(building);
 
 def get_building_orthogonal(building):
     """Gets a set of all locations orthogonally adjacent to the building. This 

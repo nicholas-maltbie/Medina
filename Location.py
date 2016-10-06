@@ -14,6 +14,10 @@ def get_column(location):
     """Gets the column of a location"""
     return location[1]
 
+def get_translate(location, rows, columns):
+    """Gets a new location that is location translated rows and columns."""
+    return make_location(get_row(location) + rows, get_column(location) + columns);
+
 def get_adjacent(location):
     """Gets the eight adjacent spots to a location"""
     row = get_row(location)
