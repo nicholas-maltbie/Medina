@@ -37,9 +37,5 @@ def OnTokenMotion(event):
     
     
 
-can.tag_bind("token", "<ButtonPress-1>", OnTokenButtonPress)
-can.tag_bind("token", "<ButtonRelease-1>", OnTokenButtonRelease)
-can.tag_bind("token", "<B1-Motion>", OnTokenMotion)
-
 tk.mainloop()
 print("STUFF")

@@ -23,13 +23,7 @@ merchants: Only for Tower tiles, the number of merchants left on the
 0
 """
 
-BUILDINGS_COLORS = ['Grey', 'Violet', 'Brown', 'Orange']
-"""Colors for different buildings: Grey, Violet, Brown, Orange""" 
-BUILDINGS_COLORS_HEX = {'Grey': 'E2E2E2', 
-                        'Violet': 'A70BAC',
-                        'Brown': '4E2E03',
-                        'Orange': 'FFD500'}
-"""Colors of the buildings in HEX color codes, RRGGBB"""
+from GameConstants import *
 
 TEA_TILE = 'TEA'
 TOWER_TILE = 'TOW'

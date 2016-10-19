@@ -31,7 +31,7 @@ def make_board(rows, columns):
             random.randrange(columns - 2) + 1)
         
     return {'Rows':rows, 'Columns':columns, 'Buildings':[], \
-        'Market':make_market(street_start), 'Towers':make_towers(rows, columns), 
+        'Market':make_market(market_start), 'Towers':make_towers(rows, columns), 
         'Well':well_location}
 
 def get_rows(board):
