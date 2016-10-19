@@ -23,7 +23,7 @@ def get_columns(towers):
     """Gets the columns of the board for towers."""
     return towers['columns']
 
-def get_wall_locations_for_tower(towers, tower_number):
+def get_wall_locations_for_tower(towers, num):
     """Gets all the locations adjacent to a specific tower number."""
     walls = []
     tower = get_tower(towers, num)
