@@ -55,7 +55,7 @@ def get_towers(board):
     return board['Towers']
 
 def get_well(board):
-    """Gets teh location of the well on a board."""
+    """Gets the location of the well on a board."""
     return board['Well']
 
 def get_all_locations(board):

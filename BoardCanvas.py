@@ -5,6 +5,7 @@ board. """
 import tkinter
 import Board
 import Location
+import Market
 from GameConstants import *
 
 """Size for the wall and tower locations"""
@@ -31,14 +32,22 @@ class BoardCanvas(tkinter.Tk):
         self.board = board
         self.can.pack()
         
+        self.tower_image = tkinter.PhotoImage(file="Assets/Tower.gif")
+        self.tower_image = self.tower_image.subsample(self.tower_image.width() // TOWER_SIZE, self.tower_image.height() // TOWER_SIZE)
+        self.well_image = tkinter.PhotoImage(file = "Assets/Well.gif")
+        self.well_image = self.well_image.subsample(self.well_image.width() // GRID_WIDTH, self.well_image.height() // GRID_HEIGHT)
+        self.merchant_image = tkinter.PhotoImage(file = "Assets/Merchant.gif")
+        self.merchant_image = tkinter.PhotoImage(file = "Assets/Merchant.gif")
+        self.merchant_image = self.well_image.subsample(self.merchant_image.width() // GRID_WIDTH, self.merchant_image.height() // GRID_HEIGHT)
+        
         if BUILDING_IMAGES == {}:
             for color in BUILDINGS_COLORS:
                 img = tkinter.PhotoImage(file="Assets/Building_" + color[0] + ".gif")
                 BUILDING_IMAGES[color] = img.subsample(img.width() // GRID_WIDTH, img.height() // GRID_HEIGHT)
-        img = tkinter.PhotoImage(file="Assets/Wall_H.gif")
-        WALL_IMAGES.append(img.subsample(img.width() // (GRID_WIDTH + GRID_GAP // 2), img.height() // WALL_WIDTH))
-        img = tkinter.PhotoImage(file="Assets/Wall_V.gif")
-        WALL_IMAGES.append(img.subsample(img.width() // WALL_WIDTH, img.height() // (GRID_HEIGHT + GRID_GAP // 2)))
+            img = tkinter.PhotoImage(file="Assets/Wall_H.gif")
+            WALL_IMAGES.append(img.subsample(img.width() // (GRID_WIDTH + GRID_GAP // 2), img.height() // WALL_WIDTH))
+            img = tkinter.PhotoImage(file="Assets/Wall_V.gif")
+            WALL_IMAGES.append(img.subsample(img.width() // WALL_WIDTH, img.height() // (GRID_HEIGHT + GRID_GAP // 2)))
         
         rows = Board.get_rows(self.board)
         columns = Board.get_columns(self.board)
@@ -55,15 +64,28 @@ class BoardCanvas(tkinter.Tk):
         self.can.tag_bind("token", "<ButtonRelease-1>", self.OnTokenButtonRelease)
         self.can.tag_bind("token", "<B1-Motion>", self.OnTokenMotion)
     
+    def setup(self):
+        self.towers = []
+        for i in range(1, 5):
+            self.can.create_image(self.get_tower_pixels(i), image = self.tower_image)
+        well = Board.get_well(self.board)
+        self.well = self.can.create_image(self.get_board_pixels(well), image = self.well_image)
+        self.add_merchant_to_grid(Market.get_active_market_street(Board.get_market(self.board))[0])
+        
+    def add_merchant_to_grid(self, location):
+        """Adds a merchant to a specified location on the grid"""
+        print(location)
+        return self.can.create_image(self.get_board_pixels(location), image= self.merchant_image)
+        
     def add_wall_to_grid(self, side, index):
         """Adds a static wall to the grid. Wall is the wall, wall 'N' is 
         the north wall, wall 'W' is the west wall, wall 'E' is east wall, wall 
         'S' is the south wall. index is the index of the wall, 0 is either top 
         or leftmost wall."""
         if side == 'N' or side == 'S':
-            self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[0])
+            return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[0])
         if side == 'W' or side == 'E':
-            self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[1])
+            return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[1])
     
     def get_board_pixels(self, location):
         """Gets the center of an grid square for a specific Location for the 
@@ -77,7 +99,7 @@ class BoardCanvas(tkinter.Tk):
         
     def add_building_to_grid(self, color, location):
         """Adds a bulding graphic to the board at a specified location"""
-        self.can.create_image(self.get_board_pixels(location), image=BUILDING_IMAGES[color])
+        return self.can.create_image(self.get_board_pixels(location), image=BUILDING_IMAGES[color])
     
     def get_wall_pixels(self, wall, index):
         """Gets the cetner of a wall location. Wall is the wall, wall 'N' is 
@@ -181,17 +203,20 @@ class BoardCanvas(tkinter.Tk):
 
 if __name__ == "__main__":
     board_canvas = BoardCanvas(Board.make_board(11,16))
-    board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(0,0))
-    board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(0,1))
-    board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(1,0))
-    board_canvas.add_building_to_grid(BUILDINGS_COLORS[3], Location.make_location(10,15))
-    board_canvas.add_wall_to_grid('S', 0)
-    board_canvas.add_wall_to_grid('S', 1)
-    board_canvas.add_wall_to_grid('S', 2)
-    board_canvas.add_wall_to_grid('S', 3)
-    board_canvas.add_wall_to_grid('W', 9)
-    board_canvas.add_wall_to_grid('W', 10)
-    board_canvas.add_wall_to_grid('N', 15)
-    board_canvas.add_wall_to_grid('E', 10)
+    board_canvas.setup()
+    built = []
+    built.append(board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(0,0)))
+    built.append(board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(0,1)))
+    built.append(board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(1,0)))
+    built.append(board_canvas.add_building_to_grid(BUILDINGS_COLORS[3], Location.make_location(10,15)))
+    built.append(board_canvas.add_wall_to_grid('S', 0))
+    built.append(board_canvas.add_wall_to_grid('S', 1))
+    built.append(board_canvas.add_wall_to_grid('S', 2))
+    built.append(board_canvas.add_wall_to_grid('S', 3))
+    built.append(board_canvas.add_wall_to_grid('W', 9))
+    built.append(board_canvas.add_wall_to_grid('W', 10))
+    built.append(board_canvas.add_wall_to_grid('N', 15))
+    built.append(board_canvas.add_wall_to_grid('E', 10))
+    print(built)
     board_canvas.mainloop()
 
