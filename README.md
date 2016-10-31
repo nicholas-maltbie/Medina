@@ -86,6 +86,11 @@ An attempt to utilize machine learning to play the board game Medina
   Pandas is used for machine learning and making decisions based on data
   interpretation.
 
+#### Guides to use the libraries ####
+
+  * [Machine learning for beginners](https://www.dataquest.io/blog/machine-learning-python/)
+  * [Python Machine Learning Book](https://github.com/rasbt/python-machine-learning-book/tree/master/code/ch01)
+  * [Specific information about Board Game AI](https://pdfs.semanticscholar.org/0517/501ddea186aeb6c6de30b0c5c27e1e4f9d96.pdf)
 
 ## The Game ##
 *Media* is a board game published by Stronghold Games (
