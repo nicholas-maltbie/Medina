@@ -15,9 +15,12 @@ An attempt to utilize machine learning to play the board game Medina
 
   if it does not give a window, the command to install tkinter on Ubuntu is
   'sudo apt-get install python3-tk', more specific information for each os to
-  instal tkinter can be found [here](http://www.tkdocs.com/tutorial/install.html)
+  install tkinter can be found [here](http://www.tkdocs.com/tutorial/install.html)
+
+  Tkinter will be used to make the GUI for the game.
 
  * [_NumPy_](http://www.numpy.org/) - mathematics library
+
   to install NumPy, use pip:
   ~~~~
   pip3 install numpy
@@ -27,7 +30,11 @@ An attempt to utilize machine learning to play the board game Medina
   python3 -m pip install numpy
   ~~~~
 
+  NumPy will be useful to compute and do operations on the large amounts of
+  numbers and math involved in analyzing a board game.
+
  * [_SciPy_](https://www.scipy.org/) - mathematics library
+
   to install SciPy, use pip:
   ~~~~
   pip3 install scipy
@@ -37,7 +44,10 @@ An attempt to utilize machine learning to play the board game Medina
   python3 -m pip install scipy
   ~~~~
 
+  SciPy will be useful to analyze numbers and results from the game.
+
  * [_scikit-learn_](http://scikit-learn.org/stable/) - data interpretation  library
+
   to install scikit-learn, use pip:
   ~~~~
   pip3 install scikit-learn
@@ -47,7 +57,10 @@ An attempt to utilize machine learning to play the board game Medina
   python3 -m pip install scikit-learn
   ~~~~
 
+  scikit-learn is used for data analysis and understanding the results of a game.
+
  * [_matplotlib_](http://matplotlib.org/) - data visualization
+
   to install matplotlib, use pip:
   ~~~~
   pip3 install matplotlib
@@ -57,7 +70,10 @@ An attempt to utilize machine learning to play the board game Medina
   python3 -m pip install matplotlib
   ~~~~
 
+  matplotlib is used to generate graphs and visuals of the data.
+
  * [_pandas_](http://pandas.pydata.org/) - data mining and ai
+
   to install matplotlib, use pip:
   ~~~~
   pip3 install pandas
@@ -66,6 +82,9 @@ An attempt to utilize machine learning to play the board game Medina
   ~~~~
   python3 -m pip install pandas
   ~~~~
+
+  Pandas is used for machine learning and making decisions based on data
+  interpretation.
 
 
 ## The Game ##
