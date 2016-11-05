@@ -68,7 +68,7 @@ class BoardCanvas(tkinter.Tk):
             self.merchant_image = tkinter.PhotoImage(file = "Assets/Merchant.gif")
             self.merchant_image = self.merchant_image.subsample(self.merchant_image.width() // GRID_WIDTH, self.merchant_image.height() // GRID_HEIGHT)
 
-
+        self.elements = [[None] * Board.get_columns(board)] * Board.get_rows(board);
 
         self.towers = []
         for i in range(1, 5):
