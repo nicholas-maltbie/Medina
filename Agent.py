@@ -27,8 +27,9 @@ import Move
 import Board
 import Player
 
-def get_all_possible_moves(board):
-    """Gets all the differnt VALID moves that can be made in a board."""
+def get_all_possible_moves(player, board):
+    """Gets all the differnt VALID moves that a player can be made in a board.
+    If there are no valid moves, a move of NONE_POSSIBLE will be returned."""
     pass
 
 def is_move_valid(move, board):
@@ -50,7 +51,7 @@ def get_random_agent()
     def make_moves(board, current, num_moves, players):
         moves = []
         for i in range(num_moves):
-            move = random.choice(get_all_possible_moves(board))
+            move = random.choice(get_all_possible_moves(current, board))
             board = apply_move(move, board)
             moves.append(move)
         return moves;

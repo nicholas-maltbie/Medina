@@ -48,7 +48,7 @@ def get_monte_carlo_agent(moves_per_branch, num_generations):
         #   Get all pratical moves
         #   Select a few of these pratical moves
         #   Evaulate the results of each of these moves and put them in the queue
-        #   Read back from the queu num_generations times
+        #   Read back from the queue num_generations times
         
         #evaulate the final board states
         
