@@ -8,15 +8,12 @@ import Location
 import Market
 from GameConstants import *
 
-"""Size for the wall and tower locations"""
-TOWER_SIZE = 50
-WALL_WIDTH = 30
-"""Width of each grid square in pixels"""
-GRID_WIDTH = 50
-"""Height of each grid squrae in pixels"""
-GRID_HEIGHT = 50
+"""Size for the wall locations"""
+WALL_WIDTH = 20
+"""Size of each grid squrae in pixels"""
+GRID_SIZE = 40
 """Size of the gap between grid locations"""
-GRID_GAP = 5
+GRID_GAP = 10
 
 #Load different images
 BUILDING_IMAGES = {}
@@ -25,37 +22,38 @@ WALL_IMAGES = []
 class BoardCanvas(tkinter.Tk):
     def __init__(self, board):
         tkinter.Tk.__init__(self)
-        self.can = tkinter.Canvas(width=(TOWER_SIZE * 2 + GRID_WIDTH * Board.get_columns(board) + GRID_GAP * (Board.get_columns(board) + 2)),
-            height=(TOWER_SIZE * 2 + GRID_HEIGHT * Board.get_rows(board) + GRID_GAP * (Board.get_rows(board) + 2)))
+        self.can = tkinter.Canvas(width=(GRID_SIZE * 3 + GRID_SIZE * Board.get_columns(board) + GRID_GAP * (Board.get_columns(board) + 2)),
+            height=(GRID_SIZE * 3 + GRID_SIZE * Board.get_rows(board) + GRID_GAP * (Board.get_rows(board) + 2)))
 
         self.drag_data = drag_data = {"x": 0, "y": 0, "item": None}
         self.board = board
         self.can.pack()
 
         self.tower_image = tkinter.PhotoImage(file="Assets/Tower.gif")
-        self.tower_image = self.tower_image.subsample(self.tower_image.width() // TOWER_SIZE, self.tower_image.height() // TOWER_SIZE)
+        self.tower_image = self.tower_image.subsample(self.tower_image.width() // GRID_SIZE, self.tower_image.height() // GRID_SIZE)
         self.well_image = tkinter.PhotoImage(file = "Assets/Well.gif")
-        self.well_image = self.well_image.subsample(self.well_image.width() // GRID_WIDTH, self.well_image.height() // GRID_HEIGHT)
+        self.well_image = self.well_image.subsample(self.well_image.width() // GRID_SIZE, self.well_image.height() // GRID_SIZE)
         self.merchant_image = None
 
         if BUILDING_IMAGES == {}:
             for color in BUILDINGS_COLORS:
                 img = tkinter.PhotoImage(file="Assets/Building_" + color[0] + ".gif")
-                BUILDING_IMAGES[color] = img.subsample(img.width() // GRID_WIDTH, img.height() // GRID_HEIGHT)
+                BUILDING_IMAGES[color] = img.subsample(img.width() // GRID_SIZE, img.height() // GRID_SIZE)
             img = tkinter.PhotoImage(file="Assets/Wall_H.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_WIDTH + GRID_GAP // 2), img.height() // WALL_WIDTH))
+            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP), img.height() // WALL_WIDTH))
             img = tkinter.PhotoImage(file="Assets/Wall_V.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // WALL_WIDTH, img.height() // (GRID_HEIGHT + GRID_GAP // 2)))
+            WALL_IMAGES.append(img.subsample(img.width() // WALL_WIDTH, img.height() // (GRID_SIZE + GRID_GAP)))
 
         rows = Board.get_rows(self.board)
         columns = Board.get_columns(self.board)
 
-        max_x = GRID_GAP * (columns) + GRID_WIDTH * (columns + 1) - WALL_WIDTH
-        max_y = GRID_GAP * (rows) + GRID_HEIGHT * (rows + 1) - WALL_WIDTH
+        max_x = GRID_GAP * (columns) + GRID_SIZE * (columns + 1)
+        max_y = GRID_GAP * (rows) + GRID_SIZE * (rows + 1)
 
-        self.offset_values = [(TOWER_SIZE, TOWER_SIZE), (max_x + GRID_GAP + GRID_WIDTH // 2 + TOWER_SIZE, TOWER_SIZE),
-                (TOWER_SIZE, max_y + GRID_GAP + GRID_HEIGHT // 2 + TOWER_SIZE),
-                (max_x + GRID_GAP + GRID_WIDTH // 2 + TOWER_SIZE, max_y + GRID_GAP + GRID_HEIGHT // 2 + TOWER_SIZE)]
+        self.offx, self.offy = GRID_SIZE + GRID_GAP * 2, GRID_SIZE * 2 + GRID_GAP
+
+        self.columns = Board.get_columns(board)
+        self.rows = Board.get_rows(board)
 
         self.draw_grid_lines()
 
@@ -64,11 +62,13 @@ class BoardCanvas(tkinter.Tk):
         self.can.tag_bind("token", "<B1-Motion>", self.OnTokenMotion)
 
     def setup(self):
+        board = self.board
         if self.merchant_image == None:
             self.merchant_image = tkinter.PhotoImage(file = "Assets/Merchant.gif")
-            self.merchant_image = self.merchant_image.subsample(self.merchant_image.width() // GRID_WIDTH, self.merchant_image.height() // GRID_HEIGHT)
+            self.merchant_image = self.merchant_image.subsample(self.merchant_image.width() // GRID_SIZE, self.merchant_image.height() // GRID_SIZE)
 
-
+        board = self.board
+        self.elements = [[None] * Board.get_columns(board)] * Board.get_rows(board);
 
         self.towers = []
         for i in range(1, 5):
@@ -95,12 +95,10 @@ class BoardCanvas(tkinter.Tk):
     def get_board_pixels(self, location):
         """Gets the center of an grid square for a specific Location for the
         board returned as (x, y)"""
-        rows = Board.get_rows(self.board)
-        columns = Board.get_columns(self.board)
+        col = Location.get_column(location)
         row = Location.get_row(location)
-        column =  Location.get_column(location)
-        return (TOWER_SIZE + GRID_GAP * (column + 1) + GRID_WIDTH * (column) + (GRID_WIDTH + GRID_GAP) // 2,
-                TOWER_SIZE + GRID_GAP * (row + 1) + GRID_HEIGHT * (row) + (GRID_HEIGHT + GRID_GAP) // 2)
+        return self.offx + col * (GRID_SIZE + 2) + (col + 1) * GRID_GAP, \
+                self.offy + row * (GRID_SIZE  + 2) + (row + 1) * GRID_GAP
 
     def add_building_to_grid(self, color, location):
         """Adds a bulding graphic to the board at a specified location"""
@@ -111,68 +109,78 @@ class BoardCanvas(tkinter.Tk):
         the north wall, wall 'W' is the west wall, wall 'E' is east wall, wall
         'S' is the south wall. index is the index of the wall, 0 is either top
         or leftmost wall."""
-        wall_size = (0,0)
-        starting = (0,0)
         if wall == 'N':
-            wall_size = (GRID_WIDTH + GRID_GAP, 0)
-            starting = (self.offset_values[0][0] + GRID_GAP + (GRID_WIDTH + GRID_GAP) // 2,
-                    self.offset_values[0][1] + GRID_GAP - WALL_WIDTH // 2)
-        elif wall == 'S':
-            wall_size = (GRID_WIDTH + GRID_GAP, 0)
-            starting = (self.offset_values[2][0] + GRID_GAP + (GRID_WIDTH + GRID_GAP) // 2,
-                    self.offset_values[2][1] + GRID_GAP - WALL_WIDTH)
-        elif wall == 'W':
-            wall_size = (0, GRID_HEIGHT + GRID_GAP)
-            starting = (self.offset_values[0][0] + GRID_GAP - WALL_WIDTH // 2,
-                    self.offset_values[0][1] + GRID_GAP + (GRID_HEIGHT + GRID_GAP) // 2)
-        elif wall == 'E':
-            wall_size = (0, GRID_HEIGHT + GRID_GAP)
-            starting = (self.offset_values[1][0] + GRID_GAP - WALL_WIDTH,
-                    self.offset_values[1][1] + GRID_GAP + (GRID_HEIGHT + GRID_GAP) // 2)
-        return (starting[0] + wall_size[0] * index, starting[1] + wall_size[1] * index)
+            x, y = self.get_board_pixels(Location.make_location(-1, index));
+            return x, y + (GRID_SIZE - GRID_GAP) // 2
+        if wall == 'E':
+            x, y = self.get_board_pixels(Location.make_location(index, -1));
+            return x + (GRID_SIZE - GRID_GAP) // 2, y
+        if wall == 'S':
+            x, y = self.get_board_pixels(Location.make_location(self.rows, index));
+            return x, y - (GRID_SIZE - GRID_GAP) // 2
+        if wall == 'W':
+            x, y = self.get_board_pixels(Location.make_location(index, self.columns));
+            return x - (GRID_SIZE - GRID_GAP) // 2, y
 
     def get_tower_pixels(self, tower_number):
         """Gets the center of a tower given the tower number"""
-        offset = [val - TOWER_SIZE  for val in self.offset_values[tower_number - 1]]
-        return (offset[0] + GRID_GAP + TOWER_SIZE // 2, offset[1] + GRID_GAP + TOWER_SIZE // 2)
+        if tower_number == 1:
+            x, y = self.get_board_pixels(Location.make_location(-1,-1))
+            return x + (GRID_GAP) // 2, y + (GRID_GAP) // 2
+        if tower_number == 2:
+            x, y = self.get_board_pixels(Location.make_location(-1,self.columns))
+            return x - (GRID_GAP) // 2, y + (GRID_GAP) // 2
+        if tower_number == 3:
+            x, y = self.get_board_pixels(Location.make_location(self.rows,-1))
+            return x + (GRID_GAP) // 2, y - (GRID_GAP) // 2
+        if tower_number == 4:
+            x, y = self.get_board_pixels(Location.make_location(self.rows,self.columns))
+            return x - (GRID_GAP) // 2, y - (GRID_GAP) // 2
 
     def draw_grid_lines(self):
         """Draws lines for the different grid boxes on the screen"""
-        rows = Board.get_rows(self.board)
-        columns = Board.get_columns(self.board)
-
-        max_x = GRID_GAP * (columns + 1) + GRID_WIDTH * columns
-        max_y = GRID_GAP * (rows + 1) + GRID_HEIGHT * rows
-
         for tower in range(1, 5):
             #Draw box for towers
             x, y = self.get_tower_pixels(tower)
-            self.can.create_line(x - TOWER_SIZE // 2, y - TOWER_SIZE // 2,
-                    x + TOWER_SIZE // 2, y - TOWER_SIZE // 2)
-            self.can.create_line(x - TOWER_SIZE // 2, y - TOWER_SIZE // 2,
-                    x - TOWER_SIZE // 2, y + TOWER_SIZE // 2)
-            self.can.create_line(x + TOWER_SIZE // 2, y - TOWER_SIZE // 2,
-                    x + TOWER_SIZE // 2, y + TOWER_SIZE // 2)
-            self.can.create_line(x - TOWER_SIZE // 2, y + TOWER_SIZE // 2,
-                    x + TOWER_SIZE // 2, y + TOWER_SIZE // 2)
+            self.can.create_line(x - GRID_SIZE // 2, y - GRID_SIZE // 2,
+                    x + GRID_SIZE // 2, y - GRID_SIZE // 2)
+            self.can.create_line(x - GRID_SIZE // 2, y - GRID_SIZE // 2,
+                    x - GRID_SIZE // 2, y + GRID_SIZE // 2)
+            self.can.create_line(x + GRID_SIZE // 2, y - GRID_SIZE // 2,
+                    x + GRID_SIZE // 2, y + GRID_SIZE // 2)
+            self.can.create_line(x - GRID_SIZE // 2, y + GRID_SIZE // 2,
+                    x + GRID_SIZE // 2, y + GRID_SIZE // 2)
 
-        #Horizontal walls
-        self.can.create_line(TOWER_SIZE + GRID_GAP, TOWER_SIZE + GRID_GAP - WALL_WIDTH,
-                TOWER_SIZE + max_x, TOWER_SIZE + GRID_GAP - WALL_WIDTH)
-        self.can.create_line(TOWER_SIZE + GRID_GAP, TOWER_SIZE + WALL_WIDTH + max_y,
-                TOWER_SIZE + max_x, TOWER_SIZE + WALL_WIDTH + max_y)
-        #Vertical walls
-        self.can.create_line(TOWER_SIZE + GRID_GAP - WALL_WIDTH, TOWER_SIZE + GRID_GAP,
-                TOWER_SIZE + GRID_GAP - WALL_WIDTH, TOWER_SIZE + max_y)
-        self.can.create_line(TOWER_SIZE + WALL_WIDTH + max_x, TOWER_SIZE + GRID_GAP,
-                TOWER_SIZE + WALL_WIDTH + max_x, TOWER_SIZE + max_y)
 
-        for row in range(0, rows + 1):
-            y = GRID_GAP * (row + 1) + GRID_HEIGHT * row
-            self.can.create_line(TOWER_SIZE + GRID_GAP - WALL_WIDTH, TOWER_SIZE + y, TOWER_SIZE + max_x + WALL_WIDTH, TOWER_SIZE + y)
-        for column in range(0, columns + 1):
-            x =  GRID_GAP * (column + 1) + GRID_WIDTH * column
-            self.can.create_line(TOWER_SIZE + x, TOWER_SIZE + GRID_GAP - WALL_WIDTH, TOWER_SIZE + x, TOWER_SIZE + max_y + WALL_WIDTH)
+        x1,y1 = self.get_board_pixels(Location.make_location(0,0))
+        x2,y2 = self.get_board_pixels(Location.make_location(self.rows, self.columns))
+        self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2, \
+                y1 - (GRID_SIZE + GRID_GAP) // 2 - WALL_WIDTH, \
+                x2 - (GRID_SIZE + GRID_GAP) // 2, \
+                y1 - (GRID_SIZE + GRID_GAP) // 2 - WALL_WIDTH)
+        self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2, \
+                y2 - (GRID_SIZE + GRID_GAP) // 2 + WALL_WIDTH, \
+                x2 - (GRID_SIZE + GRID_GAP) // 2, \
+                y2 - (GRID_SIZE + GRID_GAP) // 2 + WALL_WIDTH)
+        self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2 - WALL_WIDTH, \
+                y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                x1 - (GRID_SIZE + GRID_GAP) // 2 - WALL_WIDTH, \
+                y2 - (GRID_SIZE + GRID_GAP) // 2)
+        self.can.create_line(x2 - (GRID_SIZE + GRID_GAP) // 2 + WALL_WIDTH, \
+                y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                x2 - (GRID_SIZE + GRID_GAP) // 2 + WALL_WIDTH, \
+                y2 - (GRID_SIZE + GRID_GAP) // 2)
+
+        for row in range(0, self.rows + 1):
+            x1,y1 = self.get_board_pixels(Location.make_location(row, 0))
+            x2,y2 = self.get_board_pixels(Location.make_location(row, self.columns))
+            self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2 - WALL_WIDTH,y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x2 - (GRID_SIZE + GRID_GAP) // 2 + WALL_WIDTH,y2 - (GRID_SIZE + GRID_GAP) // 2)
+        for column in range(0, self.columns + 1):
+            x1,y1 = self.get_board_pixels(Location.make_location(0, column))
+            x2,y2 = self.get_board_pixels(Location.make_location(self.rows, column))
+            self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2,y1 - (GRID_SIZE + GRID_GAP) // 2 - WALL_WIDTH, \
+                    x2 - (GRID_SIZE + GRID_GAP) // 2,y2 - (GRID_SIZE + GRID_GAP) // 2 + WALL_WIDTH)
 
     def add_moveable_building(self, color, coords):
         """Adds a moveable building of a specified color at an x and y"""
