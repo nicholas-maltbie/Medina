@@ -111,7 +111,7 @@ A game being played
 Image from Board Game Geek by Julian Pombo uploaded on 2015-08-03
 [image source](https://boardgamegeek.com/image/2613390/medina-second-edition?size=medium)
 
-Each player is given a limited amount of resources and on each of thier turns,
+Each player is given a limited amount of resources and on each of their turns,
 players can build the city or claim a building; players can take a total of two
 actions on each of their turns. There are four different colors of buildings and
 each player can only claim one of each color. After every player has claimed a
@@ -178,7 +178,7 @@ The game should be at least implement with a partially functional GUI by October
 
 ~~_Four weeks in_ (Oct 29th):~~ Incomplete
 - ~~The game should be fully implemented over a network~~
-- ~~human players can join the game. A _JOSN_ format should be used to: manage all
+- ~~human players can join the game. A _JSON_ format should be used to: manage all
 actions of players in the game, announce game start, and determine the winner.~~
 
 _Oct 30th_ (Actual Project Start)
