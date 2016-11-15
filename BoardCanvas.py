@@ -10,7 +10,7 @@ from GameConstants import *
 
 """Size for the wall locations"""
 WALL_WIDTH = 30
-"""Size of each grid squrae in pixels"""
+"""Size of each grid square in pixels"""
 GRID_SIZE = 40
 """Size of the gap between grid locations"""
 GRID_GAP = 10
