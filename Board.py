@@ -14,6 +14,7 @@ from Building import *
 from Market import *
 from Tower import *
 
+
 def make_board(rows, columns):
     """Makes a board with a default game setup, 
     One well will be randomly placed.
@@ -22,17 +23,18 @@ def make_board(rows, columns):
     
     A board has Buildings, a market, towers, and a well
     """
-    well_location = make_location(random.randrange(rows - 2) + 1, \
-        random.randrange(columns - 2) + 1)
-    market_start = make_location(random.randrange(rows - 2) + 1, \
-        random.randrange(columns - 2) + 1)
+    well_location = random_central_location(rows, columns)
+    market_start = random_central_location(rows, columns)
     while market_start == well_location:
-        market_start = make_location(random.randrange(rows - 2) + 1, \
-            random.randrange(columns - 2) + 1)
+        market_start = random_central_location(rows, columns)
         
     return {'Rows':rows, 'Columns':columns, 'Buildings':[], \
         'Market':make_market(market_start), 'Towers':make_towers(rows, columns), 
         'Well':well_location}
+
+def random_central_location(rows, columns):
+	"""Creates a random location in the center part of town: Not touching a wall"""
+	return make_location(random.randrange(rows - 2) + 1, random.randrange(columns - 2) + 1)
 
 def get_rows(board):
     """Gets the number of rows in a board."""
