@@ -97,9 +97,9 @@ class BoardCanvas(tkinter.Tk):
         elif side == 'S':
             return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[1])
         elif side == 'E':
-            return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[3])
-        elif side == 'W':
             return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[2])
+        elif side == 'W':
+            return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[3])
 
     def get_board_pixels(self, location):
         """Gets the center of an grid square for a specific Location for the
@@ -114,7 +114,7 @@ class BoardCanvas(tkinter.Tk):
         return self.can.create_image(self.get_board_pixels(location), image=BUILDING_IMAGES[color])
 
     def get_wall_pixels(self, wall, index):
-        """Gets the cetner of a wall location. Wall is the wall, wall 'N' is
+        """Gets the center of a wall location. Wall is the wall, wall 'N' is
         the north wall, wall 'W' is the west wall, wall 'E' is east wall, wall
         'S' is the south wall. index is the index of the wall, 0 is either top
         or leftmost wall."""
@@ -122,13 +122,13 @@ class BoardCanvas(tkinter.Tk):
             x, y = self.get_board_pixels(Location.make_location(-1, index));
             return x, y
         if wall == 'E':
-            x, y = self.get_board_pixels(Location.make_location(index, -1));
+            x, y = self.get_board_pixels(Location.make_location(index, self.columns));
             return x, y
         if wall == 'S':
             x, y = self.get_board_pixels(Location.make_location(self.rows, index));
             return x, y
         if wall == 'W':
-            x, y = self.get_board_pixels(Location.make_location(index, self.columns));
+            x, y = self.get_board_pixels(Location.make_location(index, -1));
             return x, y
 
     def get_tower_pixels(self, tower_number):
