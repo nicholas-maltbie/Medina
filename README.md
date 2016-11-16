@@ -200,4 +200,4 @@ can successfully play the game and consistently obtain a decent score.
 
 ### Copyright ###
 This code is under the MIT License Copyright (c) 2016 Nicholas Maltbie, Jeet
-Shah. See LICENSE.txt for further details.
+Shah, Aaron Assaf. See LICENSE.txt for further details.
