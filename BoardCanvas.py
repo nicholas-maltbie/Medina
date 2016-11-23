@@ -43,7 +43,7 @@ class BoardCanvas(tkinter.Tk):
             WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 2), img.height() // (WALL_WIDTH)))
             img = tkinter.PhotoImage(file="Assets/Wall_South.gif")
             WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 2), img.height() // (WALL_WIDTH)))
-            
+
             img = tkinter.PhotoImage(file="Assets/Wall_East.gif")
             WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 2)))
             img = tkinter.PhotoImage(file="Assets/Wall_West.gif")
@@ -81,6 +81,9 @@ class BoardCanvas(tkinter.Tk):
         well = Board.get_well(self.board)
         self.well = self.can.create_image(self.get_board_pixels(well), image = self.well_image)
         self.add_merchant_to_grid(Market.get_active_market_street(Board.get_market(self.board))[0])
+
+    def update_display(self):
+        """Updates the board display based on the board in memory"""
 
     def add_merchant_to_grid(self, location):
         """Adds a merchant to a specified location on the grid"""
