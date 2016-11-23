@@ -9,8 +9,8 @@ import Market
 from GameConstants import *
 
 """Size for the wall locations"""
-WALL_WIDTH = 20
-"""Size of each grid squrae in pixels"""
+WALL_WIDTH = 30
+"""Size of each grid square in pixels"""
 GRID_SIZE = 40
 """Size of the gap between grid locations"""
 GRID_GAP = 10
@@ -39,10 +39,15 @@ class BoardCanvas(tkinter.Tk):
             for color in BUILDINGS_COLORS:
                 img = tkinter.PhotoImage(file="Assets/Building_" + color[0] + ".gif")
                 BUILDING_IMAGES[color] = img.subsample(img.width() // GRID_SIZE, img.height() // GRID_SIZE)
-            img = tkinter.PhotoImage(file="Assets/Wall_H.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP), img.height() // WALL_WIDTH))
-            img = tkinter.PhotoImage(file="Assets/Wall_V.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // WALL_WIDTH, img.height() // (GRID_SIZE + GRID_GAP)))
+            img = tkinter.PhotoImage(file="Assets/Wall_North.gif")
+            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 2), img.height() // (WALL_WIDTH)))
+            img = tkinter.PhotoImage(file="Assets/Wall_South.gif")
+            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 2), img.height() // (WALL_WIDTH)))
+
+            img = tkinter.PhotoImage(file="Assets/Wall_East.gif")
+            WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 2)))
+            img = tkinter.PhotoImage(file="Assets/Wall_West.gif")
+            WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 2)))
 
         rows = Board.get_rows(self.board)
         columns = Board.get_columns(self.board)
@@ -77,6 +82,9 @@ class BoardCanvas(tkinter.Tk):
         self.well = self.can.create_image(self.get_board_pixels(well), image = self.well_image)
         self.add_merchant_to_grid(Market.get_active_market_street(Board.get_market(self.board))[0])
 
+    def update_display(self):
+        """Updates the board display based on the board in memory"""
+
     def add_merchant_to_grid(self, location):
         """Adds a merchant to a specified location on the grid"""
         print(location)
@@ -87,10 +95,14 @@ class BoardCanvas(tkinter.Tk):
         the north wall, wall 'W' is the west wall, wall 'E' is east wall, wall
         'S' is the south wall. index is the index of the wall, 0 is either top
         or leftmost wall."""
-        if side == 'N' or side == 'S':
+        if side == 'N':
             return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[0])
-        if side == 'W' or side == 'E':
+        elif side == 'S':
             return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[1])
+        elif side == 'E':
+            return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[2])
+        elif side == 'W':
+            return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[3])
 
     def get_board_pixels(self, location):
         """Gets the center of an grid square for a specific Location for the
@@ -105,22 +117,22 @@ class BoardCanvas(tkinter.Tk):
         return self.can.create_image(self.get_board_pixels(location), image=BUILDING_IMAGES[color])
 
     def get_wall_pixels(self, wall, index):
-        """Gets the cetner of a wall location. Wall is the wall, wall 'N' is
+        """Gets the center of a wall location. Wall is the wall, wall 'N' is
         the north wall, wall 'W' is the west wall, wall 'E' is east wall, wall
         'S' is the south wall. index is the index of the wall, 0 is either top
         or leftmost wall."""
         if wall == 'N':
             x, y = self.get_board_pixels(Location.make_location(-1, index));
-            return x, y + (GRID_SIZE - GRID_GAP) // 2
+            return x, y
         if wall == 'E':
-            x, y = self.get_board_pixels(Location.make_location(index, -1));
-            return x + (GRID_SIZE - GRID_GAP) // 2, y
+            x, y = self.get_board_pixels(Location.make_location(index, self.columns));
+            return x, y
         if wall == 'S':
             x, y = self.get_board_pixels(Location.make_location(self.rows, index));
-            return x, y - (GRID_SIZE - GRID_GAP) // 2
+            return x, y
         if wall == 'W':
-            x, y = self.get_board_pixels(Location.make_location(index, self.columns));
-            return x - (GRID_SIZE - GRID_GAP) // 2, y
+            x, y = self.get_board_pixels(Location.make_location(index, -1));
+            return x, y
 
     def get_tower_pixels(self, tower_number):
         """Gets the center of a tower given the tower number"""
