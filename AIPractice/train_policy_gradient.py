@@ -1,6 +1,8 @@
 """MIT License
 
 Copyright (c) 2016 Daniel Slater
+
+from https://github.com/DanielSlater/AlphaToe
 """
 
 import collections
@@ -68,7 +70,7 @@ def train_policy_gradients(game_spec,
             mini_batch_board_states.append(np.ravel(board_state) * side)
             move = get_stochastic_network_move(session, input_layer, output_layer, board_state, side)
             mini_batch_moves.append(move)
-            return game_spec.flat_move_to_tuple(move.argmax())
+            return game_spec.flat_move_to_tuple(move.argmax(), side)
 
         for episode_number in range(1, number_of_games):
             # randomize if going first or second

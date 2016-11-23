@@ -24,3 +24,18 @@ b = tf.Variable(tf.zeros([9]))
 
 #now time to initialize
 sess.run(tf.initialize_all_variables())
+
+#implement the regression model
+y = tf.matmul(x,W) + b
+
+#Create the loss function
+cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y, y_))
+
+#Create the training step
+train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+
+#Play practice games against itself and save the move records into the
+# neural network
+for i in range(1000):
+  batch = mnist.train.next_batch(100)
+  train_step.run(feed_dict={x: batch[0], y_: batch[1]})

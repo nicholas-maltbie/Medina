@@ -1,6 +1,8 @@
 """MIT License
 
 Copyright (c) 2016 Daniel Slater
+
+from https://github.com/DanielSlater/AlphaToe
 """
 
 import operator

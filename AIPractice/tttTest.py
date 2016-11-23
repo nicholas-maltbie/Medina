@@ -1,12 +1,11 @@
 from ttt import *
-from tttAI import *
 
 def play_game(agent1, agent2, name1, name2):
     """Plays a game of tic tac toe with two agents and returns the winner."""
     board = make_board()
     names = [name1, name2]
     players = [agent1, agent2]
-    pieces = ['x', 'o']
+    pieces = [-1,1]
     current = random.randint(0,1)
 
     while check_winner(board) == None:

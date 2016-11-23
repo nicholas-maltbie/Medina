@@ -2,6 +2,8 @@
 
 Copyright (c) 2016 Daniel Slater
 
+https://github.com/DanielSlater/AlphaToe
+
 Builds and trains a neural network that uses policy gradients to learn to play Tic-Tac-Toe.
 The input to the network is a vector with a number for each space on the board. If the space has one of the networks
 pieces then the input vector has the value 1. -1 for the opponents space and 0 for no piece.
@@ -17,15 +19,15 @@ force a draw.
 import functools
 
 from network_helpers import create_network
-from ttt import TicTacToeGameSpec
+from tttGameSpec import TicTacToeGameSpec
 from train_policy_gradient import train_policy_gradients
 
 HIDDEN_NODES = (100, 100, 100)
 BATCH_SIZE = 100  # every how many games to do a parameter update?
 LEARN_RATE = 1e-6
 PRINT_RESULTS_EVERY_X = 1000  # every how many games to print the results
-NETWORK_FILE_PATH = None#'current_network.p'  # path to save the network to
-NUMBER_OF_GAMES_TO_RUN = 1000000
+NETWORK_FILE_PATH = 'AIPractice/current_network.p'  # path to save the network to
+NUMBER_OF_GAMES_TO_RUN = 10000
 
 # to play a different game change this to another spec, e.g TicTacToeXGameSpec or ConnectXGameSpec, to get these to run
 # well may require tuning the hyper parameters a bit
