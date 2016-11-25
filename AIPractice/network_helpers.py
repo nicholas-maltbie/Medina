@@ -139,7 +139,7 @@ def get_stochastic_network_move(session, input_layer, output_layer, board_state,
                                          feed_dict={input_layer: np_board_state})[0]
 
     if valid_only:
-        available_moves = list(game_spec.available_moves(board_state))
+        available_moves = list(game_spec.available_moves(board_state, side))
         if len(available_moves) == 1:
             move = np.zeros(game_spec.board_squares())
             np.put(move, game_spec.tuple_move_to_flat(available_moves[0]), 1)
@@ -184,9 +184,9 @@ def get_deterministic_network_move(session, input_layer, output_layer, board_sta
 
     probability_of_actions = session.run(output_layer,
                                          feed_dict={input_layer: np_board_state})[0]
-
+    from ttt import print_board
     if valid_only:
-        available_moves = game_spec.available_moves(board_state)
+        available_moves = game_spec.available_moves(board_state, side)
         available_moves_flat = [game_spec.tuple_move_to_flat(x) for x in available_moves]
         for i in range(game_spec.board_squares()):
             if i not in available_moves_flat:

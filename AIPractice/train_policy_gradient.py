@@ -68,7 +68,7 @@ def train_policy_gradients(game_spec,
 
         def make_training_move(board_state, side):
             mini_batch_board_states.append(np.ravel(board_state) * side)
-            move = get_stochastic_network_move(session, input_layer, output_layer, board_state, side)
+            move = get_stochastic_network_move(session, input_layer, output_layer, board_state, side, valid_only=True, game_spec= game_spec)
             mini_batch_moves.append(move)
             return game_spec.flat_move_to_tuple(move.argmax(), side)
 

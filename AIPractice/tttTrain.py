@@ -27,7 +27,7 @@ BATCH_SIZE = 100  # every how many games to do a parameter update?
 LEARN_RATE = 1e-6
 PRINT_RESULTS_EVERY_X = 1000  # every how many games to print the results
 NETWORK_FILE_PATH = 'AIPractice/current_network.p'  # path to save the network to
-NUMBER_OF_GAMES_TO_RUN = 10000
+NUMBER_OF_GAMES_TO_RUN = 100000
 
 # to play a different game change this to another spec, e.g TicTacToeXGameSpec or ConnectXGameSpec, to get these to run
 # well may require tuning the hyper parameters a bit

@@ -12,7 +12,10 @@ def print_board(board):
             if is_empty(board, row, col):
                 disp += " "
             else:
-                disp += str(get_piece(board, row, col))
+                if get_piece(board, row, col) == -1:
+                    disp += 'X'
+                else:
+                    disp += 'O'
 
             if col != 2:
                 disp += "|"
@@ -119,7 +122,10 @@ def make_human_agent():
         valid = False
         print_board(board)
         while not valid:
-            print("You are " + str(player) + ". Where do you want to play? 'row col': ")
+            info = 'X'
+            if player == 1:
+                info = 'O'
+            print("You are " + info + ". Where do you want to play? 'row col': ")
             try:
                 string = input()
                 if string == 'q':
