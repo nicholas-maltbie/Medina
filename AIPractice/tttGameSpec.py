@@ -11,7 +11,7 @@ class TicTacToeGameSpec(BaseGameSpec):
         return apply_move(board_state, move);
 
     def available_moves(self, board_state, side):
-        return get_possible_moves(side)
+        return get_possible_moves(board_state, side)
 
     def board_dimensions(self):
         return 3, 3
@@ -79,7 +79,7 @@ class TicTacToeGameSpec(BaseGameSpec):
         return make_move(move_index // 3, move_index % 3, side)
 
     def tuple_move_to_flat(self, tuple_move):
-        return get_move_row(tuple_move) * 3 + get_move_col()
+        return get_move_row(tuple_move) * 3 + get_move_col(tuple_move)
 
 if __name__ == '__main__':
     # example of playing a game

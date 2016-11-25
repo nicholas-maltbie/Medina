@@ -1,8 +1,11 @@
 from ttt import *
+from tttGameSpec import TicTacToeGameSpec
 
 def play_game(agent1, agent2, name1, name2):
     """Plays a game of tic tac toe with two agents and returns the winner."""
-    board = make_board()
+    game_spec = TicTacToeGameSpec()
+    return game_spec.play_game(agent1, agent2)
+    """board = make_board()
     names = [name1, name2]
     players = [agent1, agent2]
     pieces = [-1,1]
@@ -19,7 +22,7 @@ def play_game(agent1, agent2, name1, name2):
     elif win == 'x':
         return name1
     else:
-        return 'tie'
+        return 'tie'"""
 
 if __name__ == "__main__":
     distrib = {'player1':0, 'player2':0, 'tie':0}
