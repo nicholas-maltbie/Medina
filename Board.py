@@ -1,9 +1,9 @@
-"""A board is the main area of play for different players in the game. This is 
-were all game pieces are played and is used to determine most of the players' 
+"""A board is the main area of play for different players in the game. This is
+were all game pieces are played and is used to determine most of the players'
 final scores.
 
-A board inclues multiple elements: buildings (contigious blocks of building 
-pieces and stables), a market street (or streets), towers with walls branching 
+A board inclues multiple elements: buildings (contigious blocks of building
+pieces and stables), a market street (or streets), towers with walls branching
 off them, and a well.
 """
 
@@ -13,24 +13,41 @@ from Location import *
 from Building import *
 from Market import *
 from Tower import *
+from Move import *
 
 
 def make_board(rows, columns):
-    """Makes a board with a default game setup, 
+    """Makes a board with a default game setup,
     One well will be randomly placed.
     A set of towers will be made.
     A market will be created with a randomly placed merchant.
-    
+
     A board has Buildings, a market, towers, and a well
     """
     well_location = random_central_location(rows, columns)
     market_start = random_central_location(rows, columns)
     while market_start == well_location:
         market_start = random_central_location(rows, columns)
-        
+
     return {'Rows':rows, 'Columns':columns, 'Buildings':[], \
-        'Market':make_market(market_start), 'Towers':make_towers(rows, columns), 
+        'Market':make_market(market_start), 'Towers':make_towers(rows, columns),
         'Well':well_location}
+
+def get_piece(board, location):
+    """Gets a piece at a given location with from a board. The piece type
+    returned will be that of those found in Move"""
+    row = get_row(location)
+    col = get_column(location)
+    assert 0 <= row < get_rows(board) and 0 <= col < get_columns(board)
+    if market_contains_location(get_market(board), (board)):
+        return MERCHANT
+    for building in get_buildings(board):
+        if location in get_stable_locations(building):
+            return STABLE
+        elif building_contains_location(building, location):
+            return BUILDING
+    if location == get_well(board):
+        return WELL
 
 def random_central_location(rows, columns):
 	"""Creates a random location in the center part of town: Not touching a wall"""
@@ -67,8 +84,8 @@ def get_all_locations(board):
     return [make_location(i // rows, i % columns) for i in range(rows * columns)]
 
 def get_bounded_set(board, location_set):
-    """Gets a set of all locations in location_set that are within the bounds 
-    of the board. Locations are considered within the bounds if the row 
+    """Gets a set of all locations in location_set that are within the bounds
+    of the board. Locations are considered within the bounds if the row
     of the location is >= 0 and < row and if the column is >= 0 and < columns."""
     bounded = set()
     for location in location_set:
@@ -77,10 +94,10 @@ def get_bounded_set(board, location_set):
     return bounded
 
 def get_building_piece_locations(board, color):
-    """Gets all the locations in which a building piece can be attached for a 
-    specific color. If there is no building of this color currently active, 
-    this will return all open locations on the board that are not adjacent to 
-    a structure. This will return an empty list if nothing can be attached to 
+    """Gets all the locations in which a building piece can be attached for a
+    specific color. If there is no building of this color currently active,
+    this will return all open locations on the board that are not adjacent to
+    a structure. This will return an empty list if nothing can be attached to
     the building."""
     active = get_active_building(board, color)
     #If there is no active buidling, return all open locations
@@ -100,17 +117,17 @@ def get_building_piece_locations(board, color):
     return possible;
 
 def can_place_building_piece(board, location, color):
-    """Checks if a piece can be added to a board at a specific location. This 
-    involves a few checks and can be one of two cases. 
-    
-    The first case is if there is no active building of that color, then the 
-    building must be placed in an empty location that is not adjacent to any 
+    """Checks if a piece can be added to a board at a specific location. This
+    involves a few checks and can be one of two cases.
+
+    The first case is if there is no active building of that color, then the
+    building must be placed in an empty location that is not adjacent to any
     structure (well or other building).
 
-    The second case is if there is an active building of that color. Then the 
-    piece must be placed in an empty location that is orthogonal to the 
-    active building. It must be placed contigious to the building pieces in the 
-    building and cannot be attached to a stable (stables attach to buidlings, 
+    The second case is if there is an active building of that color. Then the
+    piece must be placed in an empty location that is orthogonal to the
+    active building. It must be placed contigious to the building pieces in the
+    building and cannot be attached to a stable (stables attach to buidlings,
     buildings cannot attach to stables)."""
     #If the location is not empty, return False
     if not is_location_empty(board, location):
@@ -118,9 +135,9 @@ def can_place_building_piece(board, location, color):
     #Get active building of given color
     active = get_active_building(board, color)
     #If there is no active building, check if is adjacent to a structure
-    if active == None: 
+    if active == None:
         return not is_adjacent_to_structure(board, location)
-    #If there is an active building, check to make sure the location is 
+    #If there is an active building, check to make sure the location is
     #   contigious to the building
     return location in get_building_piece_attach(active)
 
@@ -129,7 +146,7 @@ def start_new_building(board, location, color):
     get_buildings(board).append(make_building(location, color))
 
 def is_adjacent_to_structure(board, location):
-    """Checks if the location is adjacent to the well or a building. This 
+    """Checks if the location is adjacent to the well or a building. This
     includes the stables attached to a building."""
     if location in get_adjacent(get_well(board)):
         return True
@@ -139,12 +156,12 @@ def is_adjacent_to_structure(board, location):
     return False
 
 def add_market_street(board, start):
-    """Adds a new market street to the market and makes this street the active 
+    """Adds a new market street to the market and makes this street the active
     street."""
     get_market(board).add_market_street(market, start)
-    
+
 def can_place_on_current_street(board):
-    """Checks if any additions can be made to the current active market 
+    """Checks if any additions can be made to the current active market
     street in the market."""
     market = get_market(board)
     #Get possible additions to current active street.
@@ -158,10 +175,10 @@ def can_place_on_current_street(board):
     return len(possible) > 0
 
 def get_merchant_place_locations(board):
-    """This will get all the locations on the board in which a merchant can be 
-    placed. If the market street has open locations at the head or tail of the 
-    street, this will return possible open locations. If the market street does 
-    not have open locations to attach a merchant, this will return every open 
+    """This will get all the locations on the board in which a merchant can be
+    placed. If the market street has open locations at the head or tail of the
+    street, this will return possible open locations. If the market street does
+    not have open locations to attach a merchant, this will return every open
     location on the board in which a new street can be started. """
     market = get_market(board)
     #Get possible additions to current active street.
@@ -184,9 +201,9 @@ def get_merchant_place_locations(board):
         possible -= set(get_building_and_stables(building))
     possible.remove(get_well(board))
     return possible
-    
+
 def is_location_empty(board, location):
-    """Checks if a location is empty on the board. This checks if the location 
+    """Checks if a location is empty on the board. This checks if the location
     is part of the market, building, or well."""
     if location == get_well(board):
         return False;
@@ -198,12 +215,12 @@ def is_location_empty(board, location):
     return True
 
 def get_buildings_by_color(board, color):
-    """Gets all the buildings of a specified color on a board. This will return 
+    """Gets all the buildings of a specified color on a board. This will return
     an empty list if the board has no builidngs of that color."""
     return [building for building in get_buildings(board) if get_building_color(buildings)]
 
 def get_active_building(board, color):
-    """Gets the active building of a color (aka, it doesn't have an owner), or 
+    """Gets the active building of a color (aka, it doesn't have an owner), or
     None if there is no active building of that color."""
     for buliding in get_buildings_by_color(board, color):
         if not has_owner(building):
@@ -219,7 +236,7 @@ def get_num_walls_adjacent_to_building(board, building):
         if wall in orthogonal:
             count += 1
     return count
-    
+
 def get_num_merchants_adjacent_to_building(board, building):
     """Gets the number of merchants orthogonally adjacent to a given buidling."""
     merchant_locations = get_wall_locations(get_towers(board))
@@ -229,10 +246,10 @@ def get_num_merchants_adjacent_to_building(board, building):
         if merchant in orthogonal:
             count += 1
     return count
-    
+
 def get_connected_towers(board, building):
-    """Gets the tower numbers that a building is connected to. Tower's are 
-    numbered 1 through 4 each worth different points and has a different 
+    """Gets the tower numbers that a building is connected to. Tower's are
+    numbered 1 through 4 each worth different points and has a different
     associated tile."""
     def is_connected_to_tower(tower_number, orthogonal):
         tower_walls = get_wall_locations_for_tower(get_towers(board), tower_number)

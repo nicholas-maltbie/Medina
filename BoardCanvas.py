@@ -6,6 +6,7 @@ import tkinter
 import Board
 import Location
 import Market
+import Tower
 from Move import *
 from GameConstants import *
 
@@ -35,7 +36,7 @@ class BoardCanvas(tkinter.Tk):
         self.well_image = tkinter.PhotoImage(file = "Assets/Well.gif")
         self.well_image = self.well_image.subsample(self.well_image.width() // GRID_SIZE, self.well_image.height() // GRID_SIZE)
         self.merchant_image = None
-        
+
         if BUILDING_IMAGES == {}:
             for color in BUILDINGS_COLORS:
                 img = tkinter.PhotoImage(file="Assets/Building_" + color[0] + ".gif")
@@ -44,12 +45,12 @@ class BoardCanvas(tkinter.Tk):
             WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (WALL_WIDTH)))
             img = tkinter.PhotoImage(file="Assets/Wall_South.gif")
             WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (WALL_WIDTH)))
-            
+
             img = tkinter.PhotoImage(file="Assets/Wall_East.gif")
             WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 1)))
             img = tkinter.PhotoImage(file="Assets/Wall_West.gif")
             WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 1)))
-        
+
         rows = Board.get_rows(self.board)
         columns = Board.get_columns(self.board)
 
@@ -66,16 +67,16 @@ class BoardCanvas(tkinter.Tk):
         self.can.tag_bind("token", "<ButtonPress-1>", self.OnTokenButtonPress)
         self.can.tag_bind("token", "<ButtonRelease-1>", self.OnTokenButtonRelease)
         self.can.tag_bind("token", "<B1-Motion>", self.OnTokenMotion)
-        
+
         self.placed = [None] * rows;
         for row in range(rows):
             self.placed[row] = [None] * columns
-            
+
         self.placed_walls = [
             [None] * columns,   #North wall
             [None] * columns,   #South wall
             [None] * rows,      #East wall
-            [None] * rows       #West wall    
+            [None] * rows       #West wall
         ]
 
     def setup(self):
@@ -92,14 +93,14 @@ class BoardCanvas(tkinter.Tk):
             self.can.create_image(self.get_tower_pixels(i), image = self.tower_image)
         well = Board.get_well(self.board)
         self.well = self.can.create_image(self.get_board_pixels(well), image = self.well_image)
-        self.place_piece(well, "WELL")
+        self.place_piece(well, "WELL", self.well)
         self.add_merchant_to_grid(Market.get_active_market_street(Board.get_market(self.board))[0])
-        
+
         self.stable_image = tkinter.PhotoImage(file = "Assets/Stable.gif")
         self.stable_image = self.stable_image.subsample(self.stable_image.width() // GRID_SIZE, self.stable_image.height() // GRID_SIZE)
-        
-    def place_wall(self, side, index):
-        """Places a wall to the save grid, 'N' is North, 'E' is East, 'S' is 
+
+    def place_wall(self, side, index, image_id):
+        """Places a wall to the save grid, 'N' is North, 'E' is East, 'S' is
         South, 'W' is West"""
         side_index = 0
         if side == 'S':
@@ -108,12 +109,12 @@ class BoardCanvas(tkinter.Tk):
             side_index = 2
         elif side == 'W':
             side_index = 3
-        
-        self.placed_walls[side_index][index] = WALL
-    
+
+        self.placed_walls[side_index][index] = (WALL, image_id)
+
     def check_placed_wall(self, side, index):
-        """Checks if there is a wall placed in a given location, this will return 
-        either true or fase. 'N' is North, 'E' is East, 'S' is 
+        """Checks if there is a wall placed in a given location, this will return
+        either a tuple of (WALL, image_id). 'N' is North, 'E' is East, 'S' is
         South, 'W' is West"""
         side_index = 0
         if side == 'S':
@@ -122,37 +123,43 @@ class BoardCanvas(tkinter.Tk):
             side_index = 2
         elif side == 'W':
             side_index = 3
-        
-        return self.placed_walls[side_index][index] == WALL
-    
-    def place_piece(self, location, piece):
+
+        return self.placed_walls[side_index][index]
+
+    def place_piece(self, location, piece, image_id):
         """Places a piece in the saved grid"""
-        self.placed[Location.get_row(location)][Location.get_column(location)] = piece
-        
+        self.placed[Location.get_row(location)][Location.get_column(location)] = (piece, image_id)
+
     def check_placed_piece(self, location):
-        """Returns what is placed in a specific location. None means the location 
-        is empty. The pieces are the same as the names define in Move"""
+        """Returns what is placed in a specific location. None means the location
+        is empty. The pieces are the same as the names define in Move. This
+        will return a tuple of the (name of the piece, image_id)"""
         return self.placed[Location.get_row(location)][Location.get_column(location)]
-        
+
     def add_merchant_to_grid(self, location):
         """Adds a merchant to a specified location on the grid"""
-        self.place_piece(location, MERCHANT);
-        return self.can.create_image(self.get_board_pixels(location), image= self.merchant_image)
+        image_id = self.can.create_image(self.get_board_pixels(location), image= self.merchant_image);
+        self.place_piece(location, MERCHANT, image_id);
+        return image_id
 
     def add_wall_to_grid(self, side, index):
         """Adds a static wall to the grid. Wall is the wall, wall 'N' is
         the north wall, wall 'W' is the west wall, wall 'E' is east wall, wall
         'S' is the south wall. index is the index of the wall, 0 is either top
         or leftmost wall."""
-        self.place_wall(side, index)
+        image_id = -1;
         if side == 'N':
-            return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[0])
+            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[0])
         elif side == 'S':
-            return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[1])
+            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[1])
         elif side == 'E':
-            return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[2])
+            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[2])
         elif side == 'W':
-            return self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[3])
+            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[3])
+        else:
+            return;
+        self.place_wall(side, index, image_id)
+        return image_id;
 
     def get_board_pixels(self, location):
         """Gets the center of an grid square for a specific Location for the
@@ -164,16 +171,18 @@ class BoardCanvas(tkinter.Tk):
 
     def add_building_to_grid(self, color, location):
         """Adds a bulding graphic to the board at a specified location"""
-        self.place_piece(location, BUILDING)
-        return self.can.create_image(self.get_board_pixels(location), image=BUILDING_IMAGES[color])
+        image_id = self.can.create_image(self.get_board_pixels(location), image=BUILDING_IMAGES[color]);
+        self.place_piece(location, BUILDING, image_id)
+        return image_id
 
     def add_stable_to_grid(self, location):
         """Adds a stable graphic to the board at the specific location"""
-        self.place_piece(location, STABLE)
-        return self.can.create_image(self.get_board_pixels(location), image=self.stable_image)
-    
-    
-    
+        image_id = self.can.create_image(self.get_board_pixels(location), image=self.stable_image)
+        self.place_piece(location, STABLE, image_id)
+        return image_id
+
+
+
     def get_wall_pixels(self, wall, index):
         """Gets the center of a wall location. Wall is the wall, wall 'N' is
         the north wall, wall 'W' is the west wall, wall 'E' is east wall, wall
@@ -206,6 +215,84 @@ class BoardCanvas(tkinter.Tk):
         if tower_number == 4:
             x, y = self.get_board_pixels(Location.make_location(self.rows,self.columns))
             return x - (GRID_GAP) // 2, y - (GRID_GAP) // 2
+
+    def remove_piece(self, location):
+        """Removes a piece from the graphical board"""
+        item = self.check_placed_piece(location);
+        if item != None:
+            self.can.delete(item[1])
+            self.placed[Location.get_row(location)][Location.get_column(location)] = None
+
+    def remove_wall(self, side, index):
+        """Removes a wall from the graphical board"""
+        item = self.check_placed_wall(side, index)
+        if item != None:
+            side_index = 0
+            if side == 'S':
+                side_index = 1
+            elif side == 'E':
+                side_index = 2
+            elif side == 'W':
+                side_index = 3
+            self.can.delete(item[1])
+            return self.placed_walls[side_index][index] == None
+
+    def update_board(self):
+        """Updates the displayed board based on self.board"""
+        for row in range(self.rows):
+            for col in range(self.columns):
+                loc = Location.make_location(row, col);
+                board_piece = Board.get_piece(self.board, loc)
+                current = self.check_placed_piece(loc)
+                if board_piece == None and current == None:
+                    pass
+                elif board_piece == None and current != None:
+                    self.remove_piece(loc)
+                elif board_piece != None:
+                    if current != None and current[0] != board_piece:
+                        self.remove_piece(loc)
+
+                    if board_piece == STABLE:
+                        self.add_stable_to_grid(loc)
+                    elif board_piece == MERCHANT:
+                        self.add_merchant_to_grid(loc)
+                    elif board_piece == BUILDING:
+                        color = ""
+                        for building in get_buildings(board):
+                            if Building.building_contains_location(loc):
+                                color = Building.get_building_color(building)
+                        self.add_building_to_grid(color, loc)
+
+        walls = Tower.get_wall_locations(Board.get_towers(self.board))
+        for side in [-1, self.rows]:
+            for index in range(self.columns):
+                side_text = ['N', 'S']
+                if side == -1:
+                    side_text = 'N'
+                else:
+                    side_text = 'S'
+                loc = Location.make_location(side, index)
+                wall_piece = loc in walls
+                current = self.check_placed_wall(side_text, index)
+                if wall_piece and current == None:
+                    self.place_wall(side_text, index)
+                elif not wall_piece and current != None:
+                    self.remove_wall(side_text, index)
+
+        for side in [-1, self.columns]:
+            for index in range(self.rows):
+                side_text = ['E', 'W']
+                if side == -1:
+                    side_text = 'E'
+                else:
+                    side_text = 'W'
+                loc = Location.make_location(side, index)
+                wall_piece = loc in walls
+                current = self.check_placed_wall(side_text, index)
+                if wall_piece and current == None:
+                    self.place_wall(side_text, index)
+                elif not wall_piece and current != None:
+                    self.remove_wall(side_text, index)
 
     def draw_grid_lines(self):
         """Draws lines for the different grid boxes on the screen"""
@@ -284,10 +371,6 @@ class BoardCanvas(tkinter.Tk):
         self.drag_data["x"] = event.x
         self.drag_data["y"] = event.y
 
-    def update_placed(self):
-        """Updates the pieces placed based on the board."""
-        pass
-        
 if __name__ == "__main__":
     board_canvas = BoardCanvas(Board.make_board(11,16))
     board_canvas.setup()
@@ -304,24 +387,28 @@ if __name__ == "__main__":
     (board_canvas.add_wall_to_grid('N', 15))
     (board_canvas.add_wall_to_grid('E', 10))
     board_canvas.add_stable_to_grid(Location.make_location(1, 1))
-    
+
+    board_canvas.update_board()
+
+    board_canvas.add_moveable_building("Violet", (100, 100))
+
     for row in range(11):
         thingy = ""
         for col in range(16):
             thingy += str(board_canvas.check_placed_piece(Location.make_location(row, col))) + " "
-        
+
         print(thingy)
-        
+
     print()
-        
+
     for side in ['N', 'S']:
-        a = "" 
+        a = ""
         for index in range(16):
             a += str(board_canvas.check_placed_wall(side, index)) + " "
         print(a)
-    
+
     for side in ['E', 'W']:
-        a = "" 
+        a = ""
         for index in range(11):
             a += str(board_canvas.check_placed_wall(side, index)) + " "
         print(a)

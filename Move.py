@@ -1,11 +1,11 @@
-"""This module is responsible for making moves in a JSON format then interpreting 
-the results of a move by changing a board or making new moves. A move consists 
+"""This module is responsible for making moves in a JSON format then interpreting
+the results of a move by changing a board or making new moves. A move consists
 of different pieces of information:
 
 player_name: name
 move_type: {PASS or NONE_POSSIBLE or NORMAL}
 piece_played: {WALL or BUILDING or STABLE or MERCHANT or ROOFTOP or NO_PLAY}
-location: {row, column} 
+location: {row, column}
 
 >>> move = make_move('Bob',PASS)
 >>> get_player_name(move)
@@ -42,6 +42,7 @@ BUILDING = 'BUILDING'
 STABLE = 'STABLE'
 MERCHANT = 'MERCHANT'
 ROOFTOP = 'ROOFTOP'
+WELL = 'WELL'
 NO_PLAY = 'NO PLAY'
 
 
@@ -68,11 +69,10 @@ def get_piece(move):
         return None
     return getter['piece_type']
     #This should parse the move and return the piece type played (or NO_PLAY)
-    
+
 def get_location(move):
     getter = json.loads(move)
     if get_move_type(move) != NORMAL:
         return None
     return getter['location']
     #This should return a location of where the move specifies
-
