@@ -33,7 +33,7 @@ An attempt to utilize machine learning to play the board game Medina
   NumPy will be useful to compute and do operations on the large amounts of
   numbers and math involved in analyzing a board game.
 
-   * [_Tensor Flow_](www.tensorflow.org) - Neural Network library
+ * [_Tensor Flow_](www.tensorflow.org) - Neural Network library
 
     to install tensorflow, use pip:
     ~~~~
@@ -114,43 +114,6 @@ different strategies (aggressive, risky, impatient) and difficulty.
 ## Purpose ##
 This project is the project for Python Programming course at The University of
 Cincinnati Fall Semester 2016.
-
-## Time Frame ##
-*This is subject to change as many aspects of the scope and design may change
-as the project progresses*
-
-*All code should be documented as the project is made and plans to make changes
-should be logged in a file in the repo*
-
-The game should be at least implement with a partially functional GUI by October
-1st 2016 (Marks the start of the project)
-
-~~_Two weeks in_ (Oct 15th):~~ Incomplete
-- ~~The game should be fully implemented:~~
-* ~~the rules should be implemented, the game should be able to score the board.~~
-* ~~multiple players should be able to play the game on one machine.~~
-
-~~_Four weeks in_ (Oct 29th):~~ Incomplete
-- ~~The game should be fully implemented over a network~~
-- ~~human players can join the game. A _JSON_ format should be used to: manage all
-actions of players in the game, announce game start, and determine the winner.~~
-
-_Oct 30th_ (Actual Project Start)
- - current state is there is a fully implemented model and no GUI, network
- or machine learning code. AI Library and GUI library have been selected.
-
-_Two weeks in_ (Nov 12th):
-- An AI library should be selected and a plan written of how to implement an AI
-in the game. This includes benchmarking completed for designing the AI and
-similar AI for playing board games or pattern recognition.
-- A new time frame should also be made by this point for AI development.
-
-_Eight weeks in_ (Nov 26th):
-- The full game should be implemented and the AI should be implemented.
-
-_November 30th_:
-- The game should be completed with an AI implementation that
-can successfully play the game and consistently obtain a decent score.
 
 ### Copyright ###
 This code is under the MIT License Copyright (c) 2016 Nicholas Maltbie, Jeet

@@ -239,7 +239,13 @@ class BoardCanvas(tkinter.Tk):
 
     def update_board(self):
         """Updates the displayed board based on self.board"""
-        for row in range(self.rows):
+        for street in Board.get_market(self.board):
+            for merchant in street:
+                current = self.check_placed_piece(loc)
+                if current[0] != MERCHANT:
+                    self.add_merchant_to_grid(loc)
+
+        """for row in range(self.rows):
             for col in range(self.columns):
                 loc = Location.make_location(row, col);
                 board_piece = Board.get_piece(self.board, loc)
@@ -261,7 +267,7 @@ class BoardCanvas(tkinter.Tk):
                         for building in get_buildings(board):
                             if Building.building_contains_location(loc):
                                 color = Building.get_building_color(building)
-                        self.add_building_to_grid(color, loc)
+                        self.add_building_to_grid(color, loc)"""
 
         walls = Tower.get_wall_locations(Board.get_towers(self.board))
         for side in [-1, self.rows]:
