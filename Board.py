@@ -39,7 +39,7 @@ def get_piece(board, location):
     row = get_row(location)
     col = get_column(location)
     assert 0 <= row < get_rows(board) and 0 <= col < get_columns(board)
-    if market_contains_location(get_market(board), (board)):
+    if market_contains_location(get_market(board),(board)):
         return MERCHANT
     for building in get_buildings(board):
         if location in get_stable_locations(building):
@@ -143,7 +143,7 @@ def can_place_building_piece(board, location, color):
 
 def start_new_building(board, location, color):
     """Starts a new building at a given location."""
-    get_buildings(board).append(make_building(location, color))
+    get_buildings(board).append(make_building(color, location))
 
 def is_adjacent_to_structure(board, location):
     """Checks if the location is adjacent to the well or a building. This

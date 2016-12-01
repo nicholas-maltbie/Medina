@@ -27,7 +27,9 @@ class BoardCanvas(tkinter.Tk):
         self.can = tkinter.Canvas(width=(GRID_SIZE * 3 + GRID_SIZE * Board.get_columns(board) + GRID_GAP * (Board.get_columns(board) + 2)),
             height=(GRID_SIZE * 3 + GRID_SIZE * Board.get_rows(board) + GRID_GAP * (Board.get_rows(board) + 2)))
 
-        self.drag_data = drag_data = {"x": 0, "y": 0, "item": None}
+        self.drag_data = drag_data = {"x": 0, "y": 0, "item": None, "piece": None, "data": None}
+        self.listeners = []
+        self.moveable_items = {}
         self.board = board
         self.can.pack()
 
@@ -98,6 +100,8 @@ class BoardCanvas(tkinter.Tk):
 
         self.stable_image = tkinter.PhotoImage(file = "Assets/Stable.gif")
         self.stable_image = self.stable_image.subsample(self.stable_image.width() // GRID_SIZE, self.stable_image.height() // GRID_SIZE)
+
+        self.update_board()
 
     def place_wall(self, side, index, image_id):
         """Places a wall to the save grid, 'N' is North, 'E' is East, 'S' is
@@ -240,10 +244,30 @@ class BoardCanvas(tkinter.Tk):
     def update_board(self):
         """Updates the displayed board based on self.board"""
         for street in Board.get_market(self.board):
-            for merchant in street:
+            for loc in street:
                 current = self.check_placed_piece(loc)
-                if current[0] != MERCHANT:
+                if current != None and current[0] != MERCHANT:
+                    self.remove_piece(loc)
+                    current = None
+                if current == None:
                     self.add_merchant_to_grid(loc)
+
+        for building in Board.get_buildings(self.board):
+            color = Building.get_building_color(building)
+            for loc in Building.get_building_locations(building):
+                current = self.check_placed_piece(loc)
+                if current != None and current [0] != BUILDING:
+                    self.remove_piece(loc)
+                    current = None
+                if current == None:
+                    self.add_building_to_grid(color, loc)
+            for loc in Building.get_stable_locations(building):
+                current = self.check_placed_piece(loc)
+                if current != None and current[0] != STABLE:
+                    self.remove_piece(loc)
+                    current = None
+                if current == None:
+                    slef.add_stable_to_grid(loc)
 
         """for row in range(self.rows):
             for col in range(self.columns):
@@ -347,23 +371,54 @@ class BoardCanvas(tkinter.Tk):
 
     def add_moveable_building(self, color, coords):
         """Adds a moveable building of a specified color at an x and y"""
-        return self.can.create_image(coords, image=BUILDING_IMAGES[color], tags="token")
+        image_id = self.can.create_image(coords, image=BUILDING_IMAGES[color], tags="token")
+        self.moveable_items[image_id] = (BUILDING, color)
+
+    def remove_moveable_item(self, moveable_id):
+        """Removes a moveable item with a given id"""
+        del self.moveable_items[moveable_id]
+        self.can.delete(moveable_id)
+
+    def add_board_action_listener(self, listener):
+        """Adds a boar action listener, this listener must have these methods,
+        on_click(self, event, image_id, piece, data=None)
+        on_drop(self, event, image_id, piece, data=None)
+        on_move(self, event, image_id, piece, data=None)
+        piece is a the string of the piece type as defined in the Move module.
+        data is the data for the piece, it will be the color of the builidng,
+        the direction of a wall.
+        """
+        self.listeners.append(listener)
+
+    def remove_board_action_listener(self, listener):
+        """Removes a listener from the board action listeners."""
+        self.listeners.remove(listener)
 
     def OnTokenButtonPress(self, event):
         '''Being drag of an object'''
         # record the item and its location
         can = self.can
-        self.drag_data["item"] = can.find_closest(event.x, event.y)[0]
+        image_id = can.find_closest(event.x, event.y)[0]
+        self.drag_data["item"] = image_id
         self.drag_data["x"] = event.x
         self.drag_data["y"] = event.y
+        if image_id in self.moveable_items:
+            piece, data = self.moveable_items[image_id]
+            for listener in list(self.listeners):
+                listener.on_click(event, image_id, piece, data)
 
     def OnTokenButtonRelease(self, event):
         '''End drag of an object'''
         # reset the drag information
         can = self.can
+        image_id = self.drag_data["item"]
         self.drag_data["item"] = None
         self.drag_data["x"] = 0
         self.drag_data["y"] = 0
+        if image_id in self.moveable_items:
+            piece, data = self.moveable_items[image_id]
+            for listener in list(self.listeners):
+                listener.on_drop(event, image_id, piece, data)
 
     def OnTokenMotion(self, event):
         '''Handle dragging of an object'''
@@ -376,8 +431,16 @@ class BoardCanvas(tkinter.Tk):
         # record the new position
         self.drag_data["x"] = event.x
         self.drag_data["y"] = event.y
+        image_id = self.drag_data["item"]
+        if image_id in self.moveable_items:
+            piece, data = self.moveable_items[image_id]
+            for listener in list(self.listeners):
+                listener.on_move(event, image_id, piece, data)
 
 if __name__ == "__main__":
+    import random
+    import Building
+
     board_canvas = BoardCanvas(Board.make_board(11,16))
     board_canvas.setup()
     """(board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(0,0)))
@@ -394,12 +457,13 @@ if __name__ == "__main__":
     (board_canvas.add_wall_to_grid('E', 10))
     board_canvas.add_stable_to_grid(Location.make_location(1, 1))"""
 
-    print(Board.get_market(board_canvas.board))
+    building_start = Location.make_location(random.randint(0, 10), random.randint(0, 15))
+    Board.start_new_building(board_canvas.board, building_start, "Orange")
 
     board_canvas.update_board()
 
     #board_canvas.add_moveable_building("Violet", (100, 100))
-
+    """
     for row in range(11):
         thingy = ""
         for col in range(16):
@@ -419,5 +483,5 @@ if __name__ == "__main__":
         a = ""
         for index in range(11):
             a += str(board_canvas.check_placed_wall(side, index)) + " "
-        print(a)
+        print(a)"""
     board_canvas.mainloop()
