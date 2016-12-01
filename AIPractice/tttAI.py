@@ -10,6 +10,7 @@ from network_helpers import create_network, load_network, save_network, \
     get_deterministic_network_move, get_stochastic_network_move
 from tttGameSpec import TicTacToeGameSpec
 from ttt import make_human_agent
+import random
 
 game_spec = TicTacToeGameSpec()
 
@@ -84,7 +85,7 @@ def train_policy_gradients(game_spec,
 
         for episode_number in range(1, number_of_games):
             # randomize if going first or second
-            if (not randomize_first_player) or bool(random.getrandbits(1)):
+            if random.getrandbits(1):
                 reward = game_spec.play_game(make_training_move, opponent_func)
             else:
                 reward = -game_spec.play_game(opponent_func, make_training_move)

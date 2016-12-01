@@ -374,7 +374,7 @@ class BoardCanvas(tkinter.Tk):
 if __name__ == "__main__":
     board_canvas = BoardCanvas(Board.make_board(11,16))
     board_canvas.setup()
-    (board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(0,0)))
+    """(board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(0,0)))
     (board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(0,1)))
     (board_canvas.add_building_to_grid(BUILDINGS_COLORS[0], Location.make_location(1,0)))
     (board_canvas.add_building_to_grid(BUILDINGS_COLORS[3], Location.make_location(10,15)))
@@ -386,11 +386,13 @@ if __name__ == "__main__":
     (board_canvas.add_wall_to_grid('W', 10))
     (board_canvas.add_wall_to_grid('N', 15))
     (board_canvas.add_wall_to_grid('E', 10))
-    board_canvas.add_stable_to_grid(Location.make_location(1, 1))
+    board_canvas.add_stable_to_grid(Location.make_location(1, 1))"""
+
+    print(Board.get_market(board_canvas.board))
 
     board_canvas.update_board()
 
-    board_canvas.add_moveable_building("Violet", (100, 100))
+    #board_canvas.add_moveable_building("Violet", (100, 100))
 
     for row in range(11):
         thingy = ""

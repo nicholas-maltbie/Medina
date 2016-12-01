@@ -33,64 +33,18 @@ An attempt to utilize machine learning to play the board game Medina
   NumPy will be useful to compute and do operations on the large amounts of
   numbers and math involved in analyzing a board game.
 
- * [_SciPy_](https://www.scipy.org/) - mathematics library
+   * [_Tensor Flow_](www.tensorflow.org) - Neural Network library
 
-  to install SciPy, use pip:
-  ~~~~
-  pip3 install scipy
-  ~~~~
-  or the equivalent
-  ~~~~
-  python3 -m pip install scipy
-  ~~~~
+    to install tensorflow, use pip:
+    ~~~~
+    pip3 install tensorflow
+    ~~~~
+    or the equivalent
+    ~~~~
+    python3 -m pip install tensorflow
+    ~~~~
 
-  SciPy will be useful to analyze numbers and results from the game.
-
- * [_scikit-learn_](http://scikit-learn.org/stable/) - data interpretation  library
-
-  to install scikit-learn, use pip:
-  ~~~~
-  pip3 install scikit-learn
-  ~~~~
-  or the equivalent
-  ~~~~
-  python3 -m pip install scikit-learn
-  ~~~~
-
-  scikit-learn is used for data analysis and understanding the results of a game.
-
- * [_matplotlib_](http://matplotlib.org/) - data visualization
-
-  to install matplotlib, use pip:
-  ~~~~
-  pip3 install matplotlib
-  ~~~~
-  or the equivalent
-  ~~~~
-  python3 -m pip install matplotlib
-  ~~~~
-
-  matplotlib is used to generate graphs and visuals of the data.
-
- * [_pandas_](http://pandas.pydata.org/) - data mining and ai
-
-  to install matplotlib, use pip:
-  ~~~~
-  pip3 install pandas
-  ~~~~
-  or the equivalent
-  ~~~~
-  python3 -m pip install pandas
-  ~~~~
-
-  Pandas is used for machine learning and making decisions based on data
-  interpretation.
-
-#### Guides to use the libraries ####
-
-  * [Machine learning for beginners](https://www.dataquest.io/blog/machine-learning-python/)
-  * [Python Machine Learning Book](https://github.com/rasbt/python-machine-learning-book/tree/master/code/ch01)
-  * [Specific information about Board Game AI](https://pdfs.semanticscholar.org/0517/501ddea186aeb6c6de30b0c5c27e1e4f9d96.pdf)
+  Tensorflow is used to make and read neural networks.
 
 ## The Game ##
 *Media* is a board game published by Stronghold Games (
