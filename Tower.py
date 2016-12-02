@@ -26,16 +26,25 @@ def get_columns(towers):
 def get_wall_locations_for_tower(towers, num):
     """Gets all the locations adjacent to a specific tower number."""
     walls = []
-    tower = get_tower(towers, num)
-    row_mod = (-1) ** (num // 2)
-    row_offset = -row_mod
-    col_mod = (-1) ** (num % 2)
-    col_offset = -col_mod
-    start = make_location(num // 2 * get_rows(towers) + row_offset, num % 2 * get_columns(towers) + col_offset)
+    h_mod = -1
+    v_mod = -1
+    if num == 0 or num == 2:
+        h_mod = 1
+    if num == 0 or num == 1:
+        v_mod = 1
+    start = make_location(-1, -1)
+    if num == 1:
+        start = make_location(-1, get_columns(towers))
+    elif num == 2:
+        start = make_location(get_rows(towers), -1)
+    elif num == 3:
+        start = make_location(get_rows(towers), get_columns(towers))
+    tower = get_tower(towers, num + 1)
     for wall in range(get_tower_wall_h(tower)):
-        walls.append(make_location(get_translate(start, 0, col_mod * (wall + 1))))
+        walls.append(get_translate(start, 0, h_mod * (wall + 1)))
     for wall in range(get_tower_wall_v(tower)):
-        walls.append(make_location(get_translate(start, row_mod * (wall + 1), 0)))
+        walls.append(get_translate(start, v_mod * (wall + 1), 0))
+
     return walls
 
 def get_wall_locations(towers):

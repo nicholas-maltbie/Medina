@@ -24,8 +24,8 @@ WALL_IMAGES = []
 class BoardCanvas(tkinter.Tk):
     def __init__(self, board):
         tkinter.Tk.__init__(self)
-        self.can = tkinter.Canvas(width=(GRID_SIZE * 3 + GRID_SIZE * Board.get_columns(board) + GRID_GAP * (Board.get_columns(board) + 2)),
-            height=(GRID_SIZE * 3 + GRID_SIZE * Board.get_rows(board) + GRID_GAP * (Board.get_rows(board) + 2)))
+        self.can = tkinter.Canvas(width=(GRID_SIZE * (Board.get_columns(board) + 2) + GRID_GAP * (Board.get_columns(board) + 4)),
+            height=(GRID_SIZE * (Board.get_rows(board) + 2) + GRID_GAP * (Board.get_rows(board) + 4)))
 
         self.drag_data = drag_data = {"x": 0, "y": 0, "item": None, "piece": None, "data": None}
         self.listeners = []
@@ -59,7 +59,7 @@ class BoardCanvas(tkinter.Tk):
         max_x = GRID_GAP * (columns) + GRID_SIZE * (columns + 1)
         max_y = GRID_GAP * (rows) + GRID_SIZE * (rows + 1)
 
-        self.offx, self.offy = GRID_SIZE + GRID_GAP * 2, GRID_SIZE * 2 + GRID_GAP
+        self.offx, self.offy = GRID_SIZE + GRID_GAP * 2, GRID_SIZE + GRID_GAP * 2
 
         self.columns = Board.get_columns(board)
         self.rows = Board.get_rows(board)
@@ -185,8 +185,6 @@ class BoardCanvas(tkinter.Tk):
         self.place_piece(location, STABLE, image_id)
         return image_id
 
-
-
     def get_wall_pixels(self, wall, index):
         """Gets the center of a wall location. Wall is the wall, wall 'N' is
         the north wall, wall 'W' is the west wall, wall 'E' is east wall, wall
@@ -269,76 +267,30 @@ class BoardCanvas(tkinter.Tk):
                 if current == None:
                     slef.add_stable_to_grid(loc)
 
-        """for row in range(self.rows):
-            for col in range(self.columns):
-                loc = Location.make_location(row, col);
-                board_piece = Board.get_piece(self.board, loc)
-                current = self.check_placed_piece(loc)
-                if board_piece == None and current == None:
-                    pass
-                elif board_piece == None and current != None:
-                    self.remove_piece(loc)
-                elif board_piece != None:
-                    if current != None and current[0] != board_piece:
-                        self.remove_piece(loc)
-
-                    if board_piece == STABLE:
-                        self.add_stable_to_grid(loc)
-                    elif board_piece == MERCHANT:
-                        self.add_merchant_to_grid(loc)
-                    elif board_piece == BUILDING:
-                        color = ""
-                        for building in get_buildings(board):
-                            if Building.building_contains_location(loc):
-                                color = Building.get_building_color(building)
-                        self.add_building_to_grid(color, loc)"""
-
-        walls = Tower.get_wall_locations(Board.get_towers(self.board))
-        for side in [-1, self.rows]:
-            for index in range(self.columns):
-                side_text = ['N', 'S']
-                if side == -1:
-                    side_text = 'N'
-                else:
-                    side_text = 'S'
-                loc = Location.make_location(side, index)
-                wall_piece = loc in walls
+        towers = Board.get_towers(self.board)
+        for num in range(4):
+            #print(num, Tower.get_wall_locations_for_tower(towers, num))
+            for loc in Tower.get_wall_locations_for_tower(towers, num):
+                side_text = ""
+                index = 0
+                if Location.get_row(loc) == -1:
+                    side_text = "N"
+                    index = Location.get_column(loc)
+                elif Location.get_row(loc) == self.rows:
+                    side_text = "S"
+                    index = Location.get_column(loc)
+                elif Location.get_column(loc) == -1:
+                    side_text = "W"
+                    index = Location.get_row(loc)
+                elif Location.get_column(loc) == self.columns:
+                    side_text = "E"
+                    index = Location.get_row(loc)
                 current = self.check_placed_wall(side_text, index)
-                if wall_piece and current == None:
-                    self.place_wall(side_text, index)
-                elif not wall_piece and current != None:
-                    self.remove_wall(side_text, index)
-
-        for side in [-1, self.columns]:
-            for index in range(self.rows):
-                side_text = ['E', 'W']
-                if side == -1:
-                    side_text = 'E'
-                else:
-                    side_text = 'W'
-                loc = Location.make_location(side, index)
-                wall_piece = loc in walls
-                current = self.check_placed_wall(side_text, index)
-                if wall_piece and current == None:
-                    self.place_wall(side_text, index)
-                elif not wall_piece and current != None:
-                    self.remove_wall(side_text, index)
+                if current == None:
+                    self.add_wall_to_grid(side_text, index)
 
     def draw_grid_lines(self):
         """Draws lines for the different grid boxes on the screen"""
-        for tower in range(1, 5):
-            #Draw box for towers
-            x, y = self.get_tower_pixels(tower)
-            self.can.create_line(x - GRID_SIZE // 2, y - GRID_SIZE // 2,
-                    x + GRID_SIZE // 2, y - GRID_SIZE // 2)
-            self.can.create_line(x - GRID_SIZE // 2, y - GRID_SIZE // 2,
-                    x - GRID_SIZE // 2, y + GRID_SIZE // 2)
-            self.can.create_line(x + GRID_SIZE // 2, y - GRID_SIZE // 2,
-                    x + GRID_SIZE // 2, y + GRID_SIZE // 2)
-            self.can.create_line(x - GRID_SIZE // 2, y + GRID_SIZE // 2,
-                    x + GRID_SIZE // 2, y + GRID_SIZE // 2)
-
-
         x1,y1 = self.get_board_pixels(Location.make_location(0,0))
         x2,y2 = self.get_board_pixels(Location.make_location(self.rows, self.columns))
         self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2, \
@@ -359,15 +311,68 @@ class BoardCanvas(tkinter.Tk):
                 y2 - (GRID_SIZE + GRID_GAP) // 2)
 
         for row in range(0, self.rows + 1):
-            x1,y1 = self.get_board_pixels(Location.make_location(row, 0))
-            x2,y2 = self.get_board_pixels(Location.make_location(row, self.columns))
-            self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2 - WALL_WIDTH,y1 - (GRID_SIZE + GRID_GAP) // 2, \
-                    x2 - (GRID_SIZE + GRID_GAP) // 2 + WALL_WIDTH,y2 - (GRID_SIZE + GRID_GAP) // 2)
+            x1,y1 = 0,0
+            x2,y2 = 0,0
+            if row == 0 or row == self.rows:
+                x1, y1 = self.get_board_pixels(Location.make_location(row, -1))
+                x1 += GRID_GAP
+                x2, y2 = self.get_board_pixels(Location.make_location(row, self.columns + 1))
+                x2 -= GRID_GAP
+                x0, y0 = self.get_board_pixels(Location.make_location(row - 1, 0))
+                x3, y3 = self.get_board_pixels(Location.make_location(row - 1, self.columns))
+                y0 += GRID_GAP
+                if row == self.rows:
+                    x0, y0 = self.get_board_pixels(Location.make_location(row +  1, 0))
+                    x3, y3 = self.get_board_pixels(Location.make_location(row + 1, self.columns))
+                    y0 -= GRID_GAP
+                self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2,
+                    y0 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x0 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y0 - (GRID_SIZE + GRID_GAP) // 2)
+                self.can.create_line(x3 - (GRID_SIZE + GRID_GAP) // 2,
+                    y0 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x2 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y0 - (GRID_SIZE + GRID_GAP) // 2)
+            else:
+                x1, y1 = self.get_board_pixels(Location.make_location(row, 0))
+                x1 -= WALL_WIDTH
+                x2, y2 = self.get_board_pixels(Location.make_location(row, self.columns))
+                x2 += WALL_WIDTH
+            self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2 , \
+                    y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x2 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y2 - (GRID_SIZE + GRID_GAP) // 2)
+
         for column in range(0, self.columns + 1):
-            x1,y1 = self.get_board_pixels(Location.make_location(0, column))
-            x2,y2 = self.get_board_pixels(Location.make_location(self.rows, column))
-            self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2,y1 - (GRID_SIZE + GRID_GAP) // 2 - WALL_WIDTH, \
-                    x2 - (GRID_SIZE + GRID_GAP) // 2,y2 - (GRID_SIZE + GRID_GAP) // 2 + WALL_WIDTH)
+            x1, y1 = 0,0
+            x2, y2 = 0,0
+            if column == 0 or column == self.columns:
+                x1,y1 = self.get_board_pixels(Location.make_location(-1, column))
+                y1 += GRID_GAP
+                x2,y2 = self.get_board_pixels(Location.make_location(self.rows + 1, column))
+                y2 -= GRID_GAP
+                x0, y0 = self.get_board_pixels(Location.make_location(0, - 1))
+                x3, y3 = self.get_board_pixels(Location.make_location(self.rows, - 1))
+                x0 += GRID_GAP
+                if column == self.columns:
+                    x0, y0 = self.get_board_pixels(Location.make_location(0, self.columns + 1))
+                    x3, y3 = self.get_board_pixels(Location.make_location(self.rows, column + 1))
+                    x0 -= GRID_GAP
+                self.can.create_line(x0 - (GRID_SIZE + GRID_GAP) // 2,
+                    y0 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x0 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y1 - (GRID_SIZE + GRID_GAP) // 2)
+                self.can.create_line(x0 - (GRID_SIZE + GRID_GAP) // 2,
+                    y2 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x0 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y3 - (GRID_SIZE + GRID_GAP) // 2)
+            else:
+                x1,y1 = self.get_board_pixels(Location.make_location(0, column))
+                y1 -= WALL_WIDTH
+                x2,y2 = self.get_board_pixels(Location.make_location(self.rows, column))
+                y2 += WALL_WIDTH
+            self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2,y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x2 - (GRID_SIZE + GRID_GAP) // 2,y2 - (GRID_SIZE + GRID_GAP) // 2)
 
     def add_moveable_building(self, color, coords):
         """Adds a moveable building of a specified color at an x and y"""
@@ -459,6 +464,28 @@ if __name__ == "__main__":
 
     building_start = Location.make_location(random.randint(0, 10), random.randint(0, 15))
     Board.start_new_building(board_canvas.board, building_start, "Orange")
+
+    towers = Board.get_towers(board_canvas.board)
+
+    tower1 = Tower.get_tower(towers, 1)
+    Tower.add_tower_c(tower1)
+    Tower.add_tower_c(tower1)
+    Tower.add_tower_r(tower1)
+
+    tower2 = Tower.get_tower(towers, 2)
+    Tower.add_tower_c(tower2)
+    Tower.add_tower_r(tower2)
+    Tower.add_tower_r(tower2)
+
+    tower3 = Tower.get_tower(towers, 3)
+    Tower.add_tower_c(tower3)
+    Tower.add_tower_r(tower3)
+    Tower.add_tower_r(tower3)
+
+    tower4 = Tower.get_tower(towers, 4)
+    Tower.add_tower_c(tower4)
+    Tower.add_tower_c(tower4)
+    Tower.add_tower_r(tower4)
 
     board_canvas.update_board()
 
