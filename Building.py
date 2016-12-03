@@ -8,13 +8,16 @@ building, a gap must be left between buildings and the well."""
 
 from Player import *
 from Location import *
+import random
 
 def make_building(color, start):
     """Makes a building of a given color starting at a location."""
     return {'color':color,
             'locations':[start],
             'stables':[],
-            'owner':None}
+            'owner':None,
+            'owner_color':None,
+            'rooftop':None}
 
 def get_building_color(building):
     """Gets the color of a building"""
@@ -97,6 +100,14 @@ def attach_stable_location(building, location):
     """Attaches a building piece to a building."""
     get_stable_locations(building).append(location)
 
+def get_owner_color(building):
+    """Gets the color of the owner"""
+    return building['owner_color']
+
+def get_rooftop_location(building):
+    """Gets the location of a rooftop in a building"""
+    return building['rooftop']
+
 def get_owner(building):
     """Gets the owner of a building."""
     return building['owner']
@@ -105,8 +116,12 @@ def has_owner(building):
     """Checks if a building has an owner."""
     return get_owner(building) != None
 
-def assign_owner(building, player):
+def assign_owner(building, player, color, rooftop=None):
     """Sets the owner of a building. The building must not have an owner to be
     claimed."""
     assert not has_owner(building)
     building['owner'] = player
+    building['owner_color'] = color
+    if rooftop == None or rooftop not in get_building_locations(building):
+        rooftop = random.choice(get_building_locations(building))
+    building['rooftop'] = rooftop

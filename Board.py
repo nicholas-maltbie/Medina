@@ -114,7 +114,8 @@ def get_building_piece_locations(board, color):
             possible -= set(get_building_and_stables(building))
             possible -= set(get_building_stable_adjacent(building))
     well = get_well(board)
-    possible -= set(well)
+    if well in possible:
+        possible.remove(well)
     possible -= set(get_adjacent(get_well(board)))
     return get_bounded_set(board, possible);
 
@@ -189,7 +190,9 @@ def get_merchant_place_locations(board):
     possible = get_bounded_set(board, possible)
     for building in get_buildings(board):
         possible -= set(get_building_and_stables(building))
-    possible -= set(get_well(board))
+    well = get_well(board)
+    if well in possible:
+        possible.remove(well)
     #If there are open spaces, return the open spaces.
     if len(possible) > 0:
         return possible
@@ -198,11 +201,11 @@ def get_merchant_place_locations(board):
     #Remove currently occupied locations and locations next to the streets.
     for street in market:
         possible -= set(street)
-        if(street != get_active_market_street(get_market(board))):
-            possible -= set(get_adjacent_to_street(street))
+        possible -= set(get_adjacent_to_street(street))
     for building in get_buildings(board):
         possible -= set(get_building_and_stables(building))
-    possible.remove(get_well(board))
+    if well in possible:
+        possible.remove(well)
     return get_bounded_set(board, possible)
 
 def is_location_empty(board, location):

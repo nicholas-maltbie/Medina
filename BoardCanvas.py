@@ -21,6 +21,18 @@ GRID_GAP = 10
 BUILDING_IMAGES = {}
 WALL_IMAGES = []
 
+def make_edge(loc1, loc2):
+    """Makes and edge data type"""
+    return (loc1, loc2)
+
+def get_first_point(edge):
+    """Gets the first point of an edge"""
+    return edge[0]
+
+def get_second_point(edge):
+    """Gets the second point of an edge"""
+    return edge[1]
+
 class BoardCanvas(tkinter.Tk):
     def __init__(self, board):
         tkinter.Tk.__init__(self)
@@ -32,6 +44,8 @@ class BoardCanvas(tkinter.Tk):
         self.moveable_items = {}
         self.board = board
         self.can.pack()
+        self.drawn_edges = {}
+        self.drawn_rooftops = {}
 
         self.tower_image = tkinter.PhotoImage(file="Assets/Tower.gif")
         self.tower_image = self.tower_image.subsample(self.tower_image.width() // GRID_SIZE, self.tower_image.height() // GRID_SIZE)
@@ -101,7 +115,44 @@ class BoardCanvas(tkinter.Tk):
         self.stable_image = tkinter.PhotoImage(file = "Assets/Stable.gif")
         self.stable_image = self.stable_image.subsample(self.stable_image.width() // GRID_SIZE, self.stable_image.height() // GRID_SIZE)
 
+        self.rooftop_images = {}
+        for color in PLAYER_COLORS:
+            self.rooftop_images[color[0]] = tkinter.PhotoImage(file = "Assets/Rooftop_" + color[0] + ".gif")
+            self.rooftop_images[color[0]] = self.rooftop_images[color[0]].subsample( \
+                    self.rooftop_images[color[0]].width() // GRID_SIZE, self.rooftop_images[color[0]].height() // GRID_SIZE)
+
         self.update_board()
+
+    def draw_rooftop(self, loc, color):
+        """Draws a roofotp and returns the image ID"""
+        return self.can.create_image(self.get_board_pixels(loc), image=self.rooftop_images[color])
+
+    def draw_edge(self, edge, color):
+        """Draws an edge and returns the image ID"""
+        loc1 = get_first_point(edge)
+        loc2 = get_second_point(edge)
+        r1, c1 = loc1
+        r2, c2 = loc2
+        x1, y1 = self.get_board_pixels(loc1)
+        x2, y2 = self.get_board_pixels(loc2)
+        image_id = -1
+        if r1 == r2:
+            yabove = (y1 + self.get_board_pixels(Location.make_location(r1 - 1, c1))[1]) / 2
+            ybelow = (y1 + self.get_board_pixels(Location.make_location(r1 + 1, c1))[1]) / 2
+            image_id = self.can.create_line((x1 + x2) // 2, \
+                    yabove, \
+                    (x1 + x2) // 2, \
+                    ybelow, \
+                    width=GRID_GAP//4)
+        else:
+            xleft = (x1 + self.get_board_pixels(Location.make_location(r1, c1 - 1))[0]) / 2
+            xright = (x1 + self.get_board_pixels(Location.make_location(r1, c1 + 1))[0]) / 2
+            image_id = self.can.create_line(xleft, \
+                    (y1 + y2) // 2, \
+                    xright, \
+                    (y1 + y2) // 2,
+                    width=GRID_GAP//4)
+        self.can.itemconfig(image_id, fill=color)
 
     def place_wall(self, side, index, image_id):
         """Places a wall to the save grid, 'N' is North, 'E' is East, 'S' is
@@ -249,9 +300,13 @@ class BoardCanvas(tkinter.Tk):
                     current = None
                 if current == None:
                     self.add_merchant_to_grid(loc)
-
+        edges = []
+        edge_colors = {}
+        rooftops = []
+        rooftop_colors = {}
         for building in Board.get_buildings(self.board):
             color = Building.get_building_color(building)
+            all_locs = Building.get_building_and_stables(building)
             for loc in Building.get_building_locations(building):
                 current = self.check_placed_piece(loc)
                 if current != None and current [0] != BUILDING:
@@ -259,6 +314,13 @@ class BoardCanvas(tkinter.Tk):
                     current = None
                 if current == None:
                     self.add_building_to_grid(color, loc)
+                if Building.has_owner(building):
+                    for adj in Location.get_orthogonal(loc):
+                        edge = make_edge(loc, adj)
+                        if adj not in all_locs:
+                            edges.append(edge)
+                            edge_colors[edge] = Building.get_owner_color(building)
+
             for loc in Building.get_stable_locations(building):
                 current = self.check_placed_piece(loc)
                 if current != None and current[0] != STABLE:
@@ -266,6 +328,32 @@ class BoardCanvas(tkinter.Tk):
                     current = None
                 if current == None:
                     self.add_stable_to_grid(loc)
+                if Building.has_owner(building):
+                    for adj in Location.get_orthogonal(loc):
+                        edge = make_edge(loc, adj)
+                        if adj not in all_locs:
+                            edges.append(edge)
+                            edge_colors[edge] = Building.get_owner_color(building)
+
+            if Building.has_owner(building):
+                rooftops.append(Building.get_rooftop_location(building))
+                rooftop_colors[Building.get_rooftop_location(building)] = Building.get_owner_color(building)[0].upper()
+
+        for key in self.drawn_edges:
+            if key not in edges:
+                self.can.delete(self.drawn_edges[key])
+                del self.drawn_edges[key]
+        for edge in edges:
+            if edge not in self.drawn_edges:
+                self.drawn_edges[edge] = self.draw_edge(edge, edge_colors[edge])
+
+        for key in self.drawn_rooftops:
+            if key not in rooftops:
+                self.can.delete(self.drawn_rooftops[key])
+                del self.drawn_rooftops[key]
+        for rooftop in rooftops:
+            if rooftop not in self.drawn_rooftops:
+                self.drawn_rooftops[rooftop] = self.draw_rooftop(rooftop, rooftop_colors[rooftop])
 
         towers = Board.get_towers(self.board)
         for num in range(4):
@@ -464,12 +552,7 @@ if __name__ == "__main__":
 
     board = board_canvas.board;
     market = Board.get_market(board)
-    street = Market.get_active_market_street(market)
-    for i in range(5):
-        poss = list(Board.get_merchant_place_locations(board))
-        if poss:
-            sel = random.choice(poss)
-            Market.add_merchant(street, sel)
+
     import GameConstants
     for color in GameConstants.BUILDINGS_COLORS:
         poss = list(Board.get_building_piece_locations(board, color))
@@ -477,12 +560,12 @@ if __name__ == "__main__":
 
         Board.start_new_building(board_canvas.board, sel, color)
         building = Board.get_active_building(board, color)
-        for i in range(10):
+        for i in range(3):
             poss = list(Board.get_building_piece_locations(board, color))
             if poss:
                 sel = random.choice(poss)
                 Building.attach_building_locations(building, sel)
-        for i in range(3):
+        for i in range(1):
             poss = list(Board.get_building_piece_locations(board, color))
             if poss:
                 sel = random.choice(poss)
@@ -493,13 +576,13 @@ if __name__ == "__main__":
                 sel = random.choice(poss)
                 Building.attach_building_locations(building, sel)
 
-    street = Market.get_active_market_street(market)
-    for i in range(25):
+    for i in range(15):
         poss = list(Board.get_merchant_place_locations(board))
         if poss:
             sel = random.choice(poss)
-            Market.add_merchant(street, sel)
+            Market.add_merchant_to_market(market, sel)
 
+    #print(Board.get_well(board_canvas.board))
     towers = Board.get_towers(board_canvas.board)
 
     tower1 = Tower.get_tower(towers, 1)
@@ -522,7 +605,28 @@ if __name__ == "__main__":
     Tower.add_tower_c(tower4)
     Tower.add_tower_r(tower4)
 
+    orange = Board.get_active_building(board, 'Orange')
+    Building.assign_owner(orange, 'Nick', 'red')
+
     board_canvas.update_board()
+
+    import time, threading
+
+    def foo():
+        poss = list(Board.get_building_piece_locations(board, 'Orange'))
+        if poss:
+            sel = random.choice(poss)
+            if Board.get_active_building(board, 'Orange') == None:
+                Board.start_new_building(board, sel, 'Orange')
+            else:
+                Building.attach_building_locations(Board.get_active_building(board, 'Orange'), sel)
+        board_canvas.update_board()
+        threading.Timer(3, foo).start()
+
+    threading.Timer(3, foo).start()
+
+    #board_canvas.draw_edge(make_edge(Location.make_location(1,1), Location.make_location(1, 0)), "red")
+    #board_canvas.draw_edge(make_edge(Location.make_location(0, 1), Location.make_location(1, 1)), "red")
 
     #board_canvas.add_moveable_building("Violet", (100, 100))
     """

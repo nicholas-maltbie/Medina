@@ -34,6 +34,15 @@ def market_contains_location(market, loc):
             return True
     return False
 
+def add_merchant_to_market(market, merchant):
+    """Addsa a merchant to the active street or creates a new street if the merchant
+    cannot be added to the active street"""
+    poss = get_possible_addition(market)
+    if merchant in poss:
+        add_merchant(get_active_market_street(market), merchant)
+    else:
+        add_market_street(market, merchant)
+
 def get_num_streets(market):
     """Gets the number of streets in a market."""
     return len(market)
