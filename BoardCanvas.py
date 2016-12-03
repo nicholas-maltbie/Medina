@@ -34,10 +34,10 @@ def get_second_point(edge):
     return edge[1]
 
 class BoardCanvas(tkinter.Tk):
-    def __init__(self, board):
+    def __init__(self, board, additional_x=0, additional_y=0):
         tkinter.Tk.__init__(self)
-        self.can = tkinter.Canvas(width=(GRID_SIZE * (Board.get_columns(board) + 2) + GRID_GAP * (Board.get_columns(board) + 4)),
-            height=(GRID_SIZE * (Board.get_rows(board) + 2) + GRID_GAP * (Board.get_rows(board) + 3)))
+        self.can = tkinter.Canvas(width=(GRID_SIZE * (Board.get_columns(board) + 2) + GRID_GAP * (Board.get_columns(board) + 4)) + additional_x,
+            height=(GRID_SIZE * (Board.get_rows(board) + 2) + GRID_GAP * (Board.get_rows(board) + 3)) + additional_y)
 
         self.drag_data = drag_data = {"x": 0, "y": 0, "item": None, "piece": None, "data": None}
         self.listeners = []
@@ -307,9 +307,10 @@ class BoardCanvas(tkinter.Tk):
         for building in Board.get_buildings(self.board):
             color = Building.get_building_color(building)
             all_locs = Building.get_building_and_stables(building)
+            stables = Building.get_stable_locations(building)
             for loc in Building.get_building_locations(building):
                 current = self.check_placed_piece(loc)
-                if current != None and current [0] != BUILDING:
+                if loc not in stables and current != None and current [0] != BUILDING:
                     self.remove_piece(loc)
                     current = None
                 if current == None:
@@ -376,6 +377,8 @@ class BoardCanvas(tkinter.Tk):
                 current = self.check_placed_wall(side_text, index)
                 if current == None:
                     self.add_wall_to_grid(side_text, index)
+        if self.drag_data["item"] != None:
+            self.can.tag_raise(self.drag_data["item"])
 
     def draw_grid_lines(self):
         """Draws lines for the different grid boxes on the screen"""
@@ -495,6 +498,7 @@ class BoardCanvas(tkinter.Tk):
         self.drag_data["item"] = image_id
         self.drag_data["x"] = event.x
         self.drag_data["y"] = event.y
+        self.can.tag_raise(self.drag_data["item"])
         if image_id in self.moveable_items:
             piece, data = self.moveable_items[image_id]
             for listener in list(self.listeners):
@@ -628,7 +632,8 @@ if __name__ == "__main__":
     #board_canvas.draw_edge(make_edge(Location.make_location(1,1), Location.make_location(1, 0)), "red")
     #board_canvas.draw_edge(make_edge(Location.make_location(0, 1), Location.make_location(1, 1)), "red")
 
-    #board_canvas.add_moveable_building("Violet", (100, 100))
+    board_canvas.add_moveable_building("Violet", (100, 100))
+    board_canvas.add_moveable_building("Orange", (100, 150))
     """
     for row in range(11):
         thingy = ""
