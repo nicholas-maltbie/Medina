@@ -34,6 +34,14 @@ def get_second_point(edge):
     return edge[1]
 
 class BoardCanvas(tkinter.Tk):
+    def get_board_width(self):
+        """Gets the width of the board from tower to tower"""
+        return GRID_SIZE * (Board.get_columns(self.board) + 2) + GRID_GAP * (Board.get_columns(self.board) + 4)
+
+    def get_board_height(self):
+        """Gets the height of the board from tower to tower"""
+        return GRID_SIZE * (Board.get_rows(self.board) + 2) + GRID_GAP * (Board.get_rows(self.board) + 3)
+
     def __init__(self, board, additional_x=0, additional_y=0):
         tkinter.Tk.__init__(self)
         self.can = tkinter.Canvas(width=(GRID_SIZE * (Board.get_columns(board) + 2) + GRID_GAP * (Board.get_columns(board) + 4)) + additional_x,
@@ -338,7 +346,7 @@ class BoardCanvas(tkinter.Tk):
 
             if Building.has_owner(building):
                 rooftops.append(Building.get_rooftop_location(building))
-                rooftop_colors[Building.get_rooftop_location(building)] = Building.get_owner_color(building)[0].upper()
+                rooftop_colors[Building.get_rooftop_location(building)] = Building.get_owner_color(building)[0]
 
         for key in self.drawn_edges:
             if key not in edges:
@@ -346,7 +354,7 @@ class BoardCanvas(tkinter.Tk):
                 del self.drawn_edges[key]
         for edge in edges:
             if edge not in self.drawn_edges:
-                self.drawn_edges[edge] = self.draw_edge(edge, edge_colors[edge])
+                self.drawn_edges[edge] = self.draw_edge(edge, PLAYER_COLORS_HEX[edge_colors[edge]])
 
         for key in self.drawn_rooftops:
             if key not in rooftops:
@@ -469,6 +477,31 @@ class BoardCanvas(tkinter.Tk):
         """Adds a moveable building of a specified color at an x and y"""
         image_id = self.can.create_image(coords, image=BUILDING_IMAGES[color], tags="token")
         self.moveable_items[image_id] = (BUILDING, color)
+        return image_id
+
+    def add_moveable_stable(self, coords):
+        """Adds a moveable stable at an x and y"""
+        image_id = self.can.create_image(coords, image=self.stable_image, tags="token")
+        self.moveable_items[image_id] = (STABLE, None)
+        return image_id
+
+    def add_moveable_wall(self, coords):
+        """Adds a moveable wall at an x and y"""
+        image_id = self.can.create_image(coords, image=WALL_IMAGES[0], tags="token")
+        self.moveable_items[image_id] = (WALL, 'N')
+        return image_id
+
+    def add_moveable_merchant(self, coords):
+        """Adds a moveable merchant to an x and y"""
+        image_id = self.can.create_image(coords, image=self.merchant_image, tags="token")
+        self.moveable_items[image_id] = (MERCHANT, None)
+        return image_id
+
+    def add_moveable_rooftop(self, coords, color):
+        """Adds a moveable rooftop to the board"""
+        image_id = self.can.create_image(coords, image=self.rooftop_images[color[0]], tags="token")
+        self.moveable_items[image_id] = (ROOFTOP, color)
+        return image_id
 
     def remove_moveable_item(self, moveable_id):
         """Removes a moveable item with a given id"""
@@ -610,7 +643,7 @@ if __name__ == "__main__":
     Tower.add_tower_r(tower4)
 
     orange = Board.get_active_building(board, 'Orange')
-    Building.assign_owner(orange, 'Nick', 'red')
+    Building.assign_owner(orange, 'Nick', 'Red')
 
     board_canvas.update_board()
 
