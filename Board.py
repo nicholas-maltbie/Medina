@@ -80,7 +80,7 @@ def get_well(board):
 def get_all_locations(board):
     """Gets a set of all locations in a board."""
     rows = get_rows(board)
-    columns = ger_columns(board)
+    columns = get_columns(board)
     return [make_location(i // rows, i % columns) for i in range(rows * columns)]
 
 def get_bounded_set(board, location_set):
@@ -90,7 +90,7 @@ def get_bounded_set(board, location_set):
     bounded = set()
     for location in location_set:
         if is_within_bounds(location, get_rows(board), get_columns(board)):
-            bounded += location
+            bounded.add(location)
     return bounded
 
 def get_building_piece_locations(board, color):
@@ -101,20 +101,22 @@ def get_building_piece_locations(board, color):
     the building."""
     active = get_active_building(board, color)
     #If there is no active buidling, return all open locations
-    possible =[]
+    possible = set()
     if active == None:
-        possible = get_all_locations(board)
+        possible = set(get_all_locations(board))
     else:
         possible = get_building_peice_attach(active)
         possible = get_bounded_set(board, possible)
     for street in get_market(board):
         possible -= set(street);
     for building in get_buildings(board):
-        possible -= set(get_building_and_stables(building))
-        possible -= set(get_building_stable_adjacent(building))
-    possible.remove(get_well(board))
+        if building != active:
+            possible -= set(get_building_and_stables(building))
+            possible -= set(get_building_stable_adjacent(building))
+    well = get_well(board)
+    possible -= set(well)
     possible -= set(get_adjacent(get_well(board)))
-    return possible;
+    return get_bounded_set(board, possible);
 
 def can_place_building_piece(board, location, color):
     """Checks if a piece can be added to a board at a specific location. This
@@ -187,20 +189,21 @@ def get_merchant_place_locations(board):
     possible = get_bounded_set(board, possible)
     for building in get_buildings(board):
         possible -= set(get_building_and_stables(building))
-    possible.remove(get_well(board))
+    possible -= set(get_well(board))
     #If there are open spaces, return the open spaces.
     if len(possible) > 0:
         return possible
     #If there are no open spaces, get all the locations.
-    possible = get_all_locations(board)
+    possible = set(get_all_locations(board))
     #Remove currently occupied locations and locations next to the streets.
     for street in market:
         possible -= set(street)
-        possible -= set(get_adjacent_to_street(street))
+        if(street != get_active_market_street(get_market(board))):
+            possible -= set(get_adjacent_to_street(street))
     for building in get_buildings(board):
         possible -= set(get_building_and_stables(building))
     possible.remove(get_well(board))
-    return possible
+    return get_bounded_set(board, possible)
 
 def is_location_empty(board, location):
     """Checks if a location is empty on the board. This checks if the location
@@ -217,12 +220,12 @@ def is_location_empty(board, location):
 def get_buildings_by_color(board, color):
     """Gets all the buildings of a specified color on a board. This will return
     an empty list if the board has no builidngs of that color."""
-    return [building for building in get_buildings(board) if get_building_color(buildings)]
+    return [building for building in get_buildings(board) if get_building_color(building) == color]
 
 def get_active_building(board, color):
     """Gets the active building of a color (aka, it doesn't have an owner), or
     None if there is no active building of that color."""
-    for buliding in get_buildings_by_color(board, color):
+    for building in get_buildings_by_color(board, color):
         if not has_owner(building):
             return building
     return None

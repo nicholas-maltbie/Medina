@@ -265,7 +265,7 @@ class BoardCanvas(tkinter.Tk):
                     self.remove_piece(loc)
                     current = None
                 if current == None:
-                    slef.add_stable_to_grid(loc)
+                    self.add_stable_to_grid(loc)
 
         towers = Board.get_towers(self.board)
         for num in range(4):
@@ -462,8 +462,43 @@ if __name__ == "__main__":
     (board_canvas.add_wall_to_grid('E', 10))
     board_canvas.add_stable_to_grid(Location.make_location(1, 1))"""
 
-    building_start = Location.make_location(random.randint(0, 10), random.randint(0, 15))
-    Board.start_new_building(board_canvas.board, building_start, "Orange")
+    board = board_canvas.board;
+    market = Board.get_market(board)
+    street = Market.get_active_market_street(market)
+    for i in range(5):
+        poss = list(Board.get_merchant_place_locations(board))
+        if poss:
+            sel = random.choice(poss)
+            Market.add_merchant(street, sel)
+    import GameConstants
+    for color in GameConstants.BUILDINGS_COLORS:
+        poss = list(Board.get_building_piece_locations(board, color))
+        sel = random.choice(poss)
+
+        Board.start_new_building(board_canvas.board, sel, color)
+        building = Board.get_active_building(board, color)
+        for i in range(10):
+            poss = list(Board.get_building_piece_locations(board, color))
+            if poss:
+                sel = random.choice(poss)
+                Building.attach_building_locations(building, sel)
+        for i in range(3):
+            poss = list(Board.get_building_piece_locations(board, color))
+            if poss:
+                sel = random.choice(poss)
+                Building.attach_stable_location(building, sel)
+        for i in range(5):
+            poss = list(Board.get_building_piece_locations(board, color))
+            if poss:
+                sel = random.choice(poss)
+                Building.attach_building_locations(building, sel)
+
+    street = Market.get_active_market_street(market)
+    for i in range(25):
+        poss = list(Board.get_merchant_place_locations(board))
+        if poss:
+            sel = random.choice(poss)
+            Market.add_merchant(street, sel)
 
     towers = Board.get_towers(board_canvas.board)
 

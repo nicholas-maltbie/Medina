@@ -49,7 +49,7 @@ def buliding_contans_location_stables(building, location):
 def get_building_peice_attach(building):
     """Gets all the locations that building peices can be attached, this is the
     list of orthogonal location excluding those occupied by stables."""
-    return get_building_orthogonal(building) - get_stable_locations(building);
+    return get_building_orthogonal(building) - set(get_stable_locations(building));
 
 def get_building_orthogonal(building):
     """Gets a set of all locations orthogonally adjacent to the building. This
@@ -86,8 +86,9 @@ def get_building_stable_adjacent(building):
     """Gets a set of all the locations adjacent to the building and attached
     stables. This adjacency is to any attached part of the building. It does
     include locations adjacent to stables and excludes stables."""
-    included = get_building_locations().extend(get_stable_locations())
-    all_adj = set()
+    included = get_building_locations(building)
+    included.extend(get_stable_locations(building))
+    building_adj = set()
     for loc in included:
         building_adj.update([adj for adj in get_adjacent(loc) if adj not in included])
     return building_adj
