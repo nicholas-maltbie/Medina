@@ -10,7 +10,7 @@ import threading
 def make_human_agent(board_canvas, player):
     """Makes a human agent based off a player who plays on the given board"""
 
-    def human_decision(board, current, num_moves, players):
+    def human_decision(board, player_index, num_moves, players):
         pass
 
     print(board_canvas)

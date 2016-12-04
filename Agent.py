@@ -42,9 +42,9 @@ def get_all_possible_moves(player, board):
                 possible.append(Move.make_move(Player.get_player_name(player), Move.NORMAL, Move.BUILDING, loc, color))
             if(Player.get_num_stables(player) > 0):
                 possible.append(Move.make_move(Player.get_player_name(player), Move.NORMAL, Move.STABLE, loc, color))
-        building = Bord.get_active_building(board, color)
-        had_claimed = False
-        for building in Board.get_buildings_by_color(color):
+        building = Board.get_active_building(board, color)
+        has_claimed = False
+        for building in Board.get_buildings_by_color(board, color):
             if Building.get_owner(building) == Player.get_player_name(player):
                 has_claimed = True
         if not has_claimed and building != None:
@@ -52,7 +52,7 @@ def get_all_possible_moves(player, board):
                 possible.append(Move.make_move(Player.get_player_name(player), Move.NORMAL, Move.ROOFTOP, loc, color))
     for loc in Board.get_merchant_place_locations(board):
         if(Player.get_held_merchants(player) > 0):
-            possible.append(Move.make_move(Plyaer.get_player_name(player), Move.NORMAL, Move.MERCHANT, loc))
+            possible.append(Move.make_move(Player.get_player_name(player), Move.NORMAL, Move.MERCHANT, loc))
     for loc in Tower.get_possible_wall_additions(Board.get_towers(board)):
         if(Player.get_held_walls(player) > 0):
             possible.append(Move.make_move(Plyaer.get_player_name(player), Move.NORMAL, Move.WALL, loc))
@@ -127,9 +127,9 @@ def apply_move(move, board, player_index, players):
                     start = make_location(get_rows(towers), get_columns(towers))
                 tower = get_tower(towers, num + 1)
 
-                if loc == (get_translate(start, 0, h_mod * (get_columns(tower) + 1)))
+                if loc == (get_translate(start, 0, h_mod * (get_columns(tower) + 1))):
                     Tower.add_tower_c(tower)
-                elif loc == (get_translate(start, v_mod * (get_rows(tower) + 1), 0))
+                elif loc == (get_translate(start, v_mod * (get_rows(tower) + 1), 0)):
                     Tower.add_tower_r(tower)
     return board, players
 

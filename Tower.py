@@ -77,9 +77,10 @@ def get_possible_wall_additions(towers):
     """Gets all the possible addtions from each tower."""
     possible = []
     for i in range(1, 5):
-        tower = toers.get_tower(i)
+        tower = get_tower(towers, i)
         h_mod = -1
         v_mod = -1
+        num = i
         if num == 0 or num == 2:
             h_mod = 1
         if num == 0 or num == 1:
