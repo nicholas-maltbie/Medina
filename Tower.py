@@ -73,6 +73,32 @@ def add_tower_c(tower):
     """Adds one to a tower's column size."""
     tower['builtH'] += 1;
 
+def get_possible_wall_additions(towers):
+    """Gets all the possible addtions from each tower."""
+    possible = []
+    for i in range(1, 5):
+        tower = toers.get_tower(i)
+        h_mod = -1
+        v_mod = -1
+        if num == 0 or num == 2:
+            h_mod = 1
+        if num == 0 or num == 1:
+            v_mod = 1
+        start = make_location(-1, -1)
+        if num == 1:
+            start = make_location(-1, get_columns(towers))
+        elif num == 2:
+            start = make_location(get_rows(towers), -1)
+        elif num == 3:
+            start = make_location(get_rows(towers), get_columns(towers))
+        tower = get_tower(towers, num + 1)
+
+        if can_add_c(towers, i):
+            possible.append(get_translate(start, 0, h_mod * (get_columns(tower) + 1)))
+        if can_acc_r(towers, i):
+            possible.append(get_translate(start, v_mod * (get_rows(tower) + 1), 0))
+    return possible
+
 def can_add_c(towers, tower_number):
     """Checks if an addition can be made to a tower on the horizontal wall.
     tower_number must be between 1 and 4 (inclusive both)"""

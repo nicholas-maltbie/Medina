@@ -46,17 +46,22 @@ WELL = 'WELL'
 NO_PLAY = 'NO PLAY'
 
 
-def make_move(player_name, move_type, piece_type=None, location=None):
+def make_move(player_name, move_type, piece_type=None, location=None, color=None):
     if move_type != NORMAL:
         assert piece_type == None and location == None
 
-    return json.dumps({"player_name": player_name, "move_type": move_type, "piece_type": piece_type, "location": location})
+    return json.dumps({"player_name": player_name, "move_type": move_type,
+            "piece_type": piece_type, "location": location,"color": color})
     #this should return a move with the following information in a JSON format
 
 def get_player_name(move):
     getter = json.loads(move)
     return getter['player_name']
     #This should parse a move and return the player name
+
+def get_move_color(move):
+    getter = json.loads(move)
+    return getter['color']
 
 def get_move_type(move):
     getter = json.loads(move)

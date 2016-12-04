@@ -21,7 +21,7 @@ from Tile import *
         tiles: Tiles the player has acquired."""
 
 BUILDINGS_GIVEN = {2:8,3:6,4:5}
-#Buildings given to each player depending on game size
+#Buildings given to each player depending on game size))
 ROOFTOPS_GIVEN = {2:4,3:4,4:4}
 #Rooftops given to each player
 EXTRA_ROOFTOPS_GIVEN = {2:2, 3:1, 4:0}
@@ -48,6 +48,14 @@ def make_player(name, num_players, player_color='Blue'):
         'merchants':MERCHANTS_GIVEN[num_players], 'walls':WALLS_GIVEN[num_players],
         'tiles':[], 'color':player_color}
 
+def clone_player(player):
+    """Clones a player"""
+    return {'name':get_player_name(player),'buildings':get_buildings(player).copy(),
+            'stables':get_num_stables(player), 'rooftops':get_held_rooftops(player),
+            'merchants':get_held_merchants(player),'walls': get_held_walls(player),
+            'color':get_player_color(player),
+            'tiles':[Tile.clone_tile(tile) for tile in get_tiles(player)]}
+
 def get_num_stables(player):
     """Gets the number of stables a player has"""
     return player['stables']
@@ -67,6 +75,10 @@ def get_player_name(player):
 def get_held_buildings(player):
     """Gets the buildings held by a player"""
     return player['buildings']
+
+def remvoe_all_buildings_of_color(player, color):
+    """Removes all the buildings that a player has of a color"""
+    get_held_buildings(player)[color] = 0
 
 def play_building(player, color):
     """Decrements the number of buildings a player is holding of a specific

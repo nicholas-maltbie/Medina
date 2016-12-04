@@ -10,6 +10,8 @@ from Player import *
 from Location import *
 import random
 
+NEUTRAL_OWNER = ()
+
 def make_building(color, start):
     """Makes a building of a given color starting at a location."""
     return {'color':color,
@@ -18,6 +20,14 @@ def make_building(color, start):
             'owner':None,
             'owner_color':None,
             'rooftop':None}
+
+def clone_building(building):
+    """Clones a building"""
+    return {'color': get_building_color(building),
+            'stables': get_stable_locations(building)[:],
+            'owner': get_owner(building),
+            'owner_color': get_owner_color(building),
+            'rooftop': get_rooftop_location(building)}
 
 def get_building_color(building):
     """Gets the color of a building"""

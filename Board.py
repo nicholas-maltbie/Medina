@@ -30,7 +30,15 @@ def make_board(rows, columns):
         market_start = random_central_location(rows, columns)
 
     return {'Rows':rows, 'Columns':columns, 'Buildings':[], \
-        'Market':make_market(market_start), 'Towers':make_towers(rows, columns),
+        'Market':make_market(market_start), 'Towers':make_towers(rows, columns), \
+        'Well':well_location}
+
+def clone_board(board):
+    """makes a deep clone of a board"""
+    return {'Rows':get_rows(board), 'Columns':get_columns(bord), \
+        'Buildings':[Building.clone_building(building) for building in get_buildings(board)], \
+        'Market':Market.clone_market(get_market(board)),
+        'Towers':Towers.clone_towers(get_towers(board)),
         'Well':well_location}
 
 def get_piece(board, location):
@@ -92,6 +100,22 @@ def get_bounded_set(board, location_set):
         if is_within_bounds(location, get_rows(board), get_columns(board)):
             bounded.add(location)
     return bounded
+
+def get_stable_piece_location(board):
+    """Gets all the locations in which a stable can be attached to a building"""
+    possible = set()
+    for building in get_buildings(board):
+        temp = set(get_building_peice_attach(building))
+        for building2 in get_buildings(board):
+            if building2 != building:
+                temp -= set(get_building_and_stables(building))
+                temp -= set(get_building_stable_adjacent(building))
+        possible += temp
+    well = get_well(board)
+    if well in possible:
+        possible.remove(well)
+    possible -= set(get_adjacent(get_well(board)))
+    return get_bounded_set(board, possible)
 
 def get_building_piece_locations(board, color):
     """Gets all the locations in which a building piece can be attached for a

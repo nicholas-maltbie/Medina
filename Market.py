@@ -20,6 +20,10 @@ market street is also restricted by the old market street(s).
 
 from Location import *
 
+def clone_market(market):
+    """Clones a market"""
+    return [street[:] for street in market]
+
 def make_market(start):
     """This function will make a market which is the list of all the market
     streets of merchants there are in the game."""
