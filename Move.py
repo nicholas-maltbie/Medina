@@ -25,7 +25,7 @@ True
 >>> get_piece(move)
 'WALL'
 >>> get_location(move)
-[1, 2]
+(1, 2)
 """
 
 import Location
@@ -79,5 +79,6 @@ def get_location(move):
     getter = json.loads(move)
     if get_move_type(move) != NORMAL:
         return None
-    return getter['location']
+    loc = getter['location']
+    return Location.make_location(loc[0], loc[1])
     #This should return a location of where the move specifies

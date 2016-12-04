@@ -48,14 +48,14 @@ def get_all_possible_moves(player, board):
             if Building.get_owner(building) == Player.get_player_name(player):
                 has_claimed = True
         if not has_claimed and building != None:
-            for loc in building.get_building_piece_locations():
+            for loc in Building.get_building_locations(building):
                 possible.append(Move.make_move(Player.get_player_name(player), Move.NORMAL, Move.ROOFTOP, loc, color))
     for loc in Board.get_merchant_place_locations(board):
         if(Player.get_held_merchants(player) > 0):
             possible.append(Move.make_move(Player.get_player_name(player), Move.NORMAL, Move.MERCHANT, loc))
     for loc in Tower.get_possible_wall_additions(Board.get_towers(board)):
         if(Player.get_held_walls(player) > 0):
-            possible.append(Move.make_move(Plyaer.get_player_name(player), Move.NORMAL, Move.WALL, loc))
+            possible.append(Move.make_move(Player.get_player_name(player), Move.NORMAL, Move.WALL, loc))
 
     has_tea = False
     for tile in Player.get_tiles(player):
@@ -92,7 +92,7 @@ def apply_move(move, board, player_index, players):
         elif piece == Move.STABLE:
             Player.play_stable(player)
             for building in Board.get_buildings(board):
-                if loc in get_building_peice_attach(building):
+                if loc in Building.get_building_peice_attach(building):
                     Building.attach_stable_location(building, loc)
         elif piece == Move.MERCHANT:
             Player.play_merchant(player)
@@ -101,17 +101,17 @@ def apply_move(move, board, player_index, players):
             color = Move.get_move_color(move)
             Player.play_rooftop(player)
             Building.assign_owner(Board.get_active_building(board, color), Player.get_player_color(player), loc)
-            Board.get_buildings_by_color(color)
+            Board.get_buildings_by_color(board, color)
             claimed = []
-            for buliding in Board.get_buildings_by_color(board, color):
-                if Building.has_owner(building) and get_owner(building) != Building.NEUTRAL_OWNER:
+            for building in Board.get_buildings_by_color(board, color):
+                if Building.has_owner(building) and Building.get_owner(building) != Building.NEUTRAL_OWNER:
                     claimed.append(building.get_owner(building))
             if len(claimed) == len(players):
                 for player in players:
                     Player.remvoe_all_buildings_of_color(player, color)
         elif piece == Move.WALL:
-            for i in range(1, 5):
-                tower = toers.get_tower(i)
+            for num in range(1, 5):
+                tower = Tower.get_tower(Board.get_towers(board), num)
                 h_mod = -1
                 v_mod = -1
                 if num == 0 or num == 2:

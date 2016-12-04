@@ -24,6 +24,7 @@ def make_building(color, start):
 def clone_building(building):
     """Clones a building"""
     return {'color': get_building_color(building),
+            'locations': get_building_locations(building)[:],
             'stables': get_stable_locations(building)[:],
             'owner': get_owner(building),
             'owner_color': get_owner_color(building),
@@ -53,7 +54,9 @@ def buidling_contains_location(building, location):
 
 def get_building_and_stables(building):
     """Gets all the building and stable locations of a building in a single list."""
-    return get_stable_locations(building) + get_building_locations(building)
+    locs = set(get_stable_locations(building))
+    locs = locs.union(get_building_locations(building))
+    return locs
 
 def buliding_contans_location_stables(building, location):
     """Checks if a building or it's attached stables contains a location."""

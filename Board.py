@@ -35,11 +35,11 @@ def make_board(rows, columns):
 
 def clone_board(board):
     """makes a deep clone of a board"""
-    return {'Rows':get_rows(board), 'Columns':get_columns(bord), \
-        'Buildings':[Building.clone_building(building) for building in get_buildings(board)], \
-        'Market':Market.clone_market(get_market(board)),
-        'Towers':Towers.clone_towers(get_towers(board)),
-        'Well':well_location}
+    return {'Rows':get_rows(board), 'Columns':get_columns(board), \
+        'Buildings':[clone_building(building) for building in get_buildings(board)], \
+        'Market':clone_market(get_market(board)),
+        'Towers':clone_towers(get_towers(board)),
+        'Well':get_well(board)}
 
 def get_piece(board, location):
     """Gets a piece at a given location with from a board. The piece type
@@ -135,8 +135,13 @@ def get_building_piece_locations(board, color):
         possible -= set(street);
     for building in get_buildings(board):
         if building != active:
-            possible -= set(get_building_and_stables(building))
-            possible -= set(get_building_stable_adjacent(building))
+            #print(get_building_and_stables(building))
+            for loc in get_building_and_stables(building):
+                if loc in possible:
+                    possible.remove(loc)
+            for loc in get_building_stable_adjacent(building):
+                if loc in possible:
+                    possible.remove(loc)
     well = get_well(board)
     if well in possible:
         possible.remove(well)

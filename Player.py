@@ -50,7 +50,7 @@ def make_player(name, num_players, player_color='Blue'):
 
 def clone_player(player):
     """Clones a player"""
-    return {'name':get_player_name(player),'buildings':get_buildings(player).copy(),
+    return {'name':get_player_name(player),'buildings':get_held_buildings(player).copy(),
             'stables':get_num_stables(player), 'rooftops':get_held_rooftops(player),
             'merchants':get_held_merchants(player),'walls': get_held_walls(player),
             'color':get_player_color(player),
@@ -66,7 +66,7 @@ def get_player_color(player):
 
 def play_stable(player):
     """Plays a stable on the board"""
-    players['stables'] -= 1
+    player['stables'] -= 1
 
 def get_player_name(player):
     """Gets the name of a player"""

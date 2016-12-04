@@ -15,6 +15,11 @@ def make_towers(rows, columns):
     numbered 1, 2, 3, and 4."""
     return {'rows': rows, 'columns': columns, 'towers': [make_tower(i + 1) for i in range(0, 4)]}
 
+def clone_towers(towers):
+    """Clones a group of towers"""
+    return {'rows': get_rows(towers), 'columns': get_columns(towers), \
+            'towers':[clone_tower(get_tower(towers, i)) for i in range(1, 5)]}
+
 def get_rows(towers):
     """Gets the rows of the board for towers."""
     return towers['rows']
@@ -92,12 +97,12 @@ def get_possible_wall_additions(towers):
             start = make_location(get_rows(towers), -1)
         elif num == 3:
             start = make_location(get_rows(towers), get_columns(towers))
-        tower = get_tower(towers, num + 1)
+        tower = get_tower(towers, num)
 
         if can_add_c(towers, i):
-            possible.append(get_translate(start, 0, h_mod * (get_columns(tower) + 1)))
-        if can_acc_r(towers, i):
-            possible.append(get_translate(start, v_mod * (get_rows(tower) + 1), 0))
+            possible.append(get_translate(start, 0, h_mod * (get_tower_wall_h(tower) + 1)))
+        if can_add_r(towers, i):
+            possible.append(get_translate(start, v_mod * (get_tower_wall_v(tower) + 1), 0))
     return possible
 
 def can_add_c(towers, tower_number):
@@ -125,6 +130,10 @@ def can_add_r(towers, tower_number):
 def make_tower(number):
     """Creates a tower with a given number."""
     return {'builtV': 0, 'builtH': 0, 'number':number}
+
+def clone_tower(tower):
+    """Clones a tower"""
+    return tower.copy()
 
 def get_tower_wall_v(tower):
     """Gets the rows of a tower's verticial wall."""
