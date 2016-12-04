@@ -37,7 +37,7 @@ def play_game(board, board_canvas):
         for move in selected:
             board, players = Agent.apply_move(move, board, current_player, players)
         board_canvas.board = board
-        #board_canvas.update_board()
+        board_canvas.update_board()
         current_player = (current_player + 1) % len(players)
         time.sleep(5)
         print(board)
