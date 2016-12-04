@@ -36,17 +36,17 @@ def get_building_color(building):
 
 def get_building_locations(building):
     """Gets all the locations a building pieces occupies."""
-    return building['locations']
+    return building['locations'][:]
 
 def attach_building_locations(building, location):
     """Attaches a building piece to the buliding. The building must no be
     claimed in order to attach building segments."""
     assert not has_owner(building)
-    get_building_locations(building).append(location)
+    building['locations'].append(location)
 
 def get_stable_locations(building):
     """Gets all the stables attached to a building."""
-    return building['stables']
+    return building['stables'][:]
 
 def buidling_contains_location(building, location):
     """Checks if a location is part of the building."""
@@ -65,7 +65,7 @@ def buliding_contans_location_stables(building, location):
 def get_building_peice_attach(building):
     """Gets all the locations that building peices can be attached, this is the
     list of orthogonal location excluding those occupied by stables."""
-    return get_building_orthogonal(building) - set(get_stable_locations(building));
+    return get_building_orthogonal(building).difference(set(get_stable_locations(building)));
 
 def get_building_orthogonal(building):
     """Gets a set of all locations orthogonally adjacent to the building. This
@@ -73,15 +73,18 @@ def get_building_orthogonal(building):
     include the location of stables adjacent to the building if any are
     attached."""
     included = get_building_locations(building)
+    stables = get_stable_locations(building)
     building_orth = set()
     for loc in included:
-        building_orth.update([orth for orth in get_orthogonal(loc) if orth not in included])
+        if loc not in stables:
+            building_orth.update([orth for orth in get_orthogonal(loc) if orth not in included])
     return building_orth
 
 def get_building_stable_orthogonal(building):
     """Gets a set of all locations orthogonally adjacent to the building and
     attached stables. This exclues the locations of stables."""
-    included = get_building_locations(building).extend(get_stable_locations())
+    included = get_building_locations(building)[:]
+    included.extend(get_stable_locations())
     building_orth = set()
     for loc in included:
         building_orth.update([orth for orth in get_orthogonal(loc) if orth not in included])
@@ -111,7 +114,7 @@ def get_building_stable_adjacent(building):
 
 def attach_stable_location(building, location):
     """Attaches a building piece to a building."""
-    get_stable_locations(building).append(location)
+    building['stables'].append(location)
 
 def get_owner_color(building):
     """Gets the color of the owner"""

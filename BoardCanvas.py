@@ -4,6 +4,7 @@ board. """
 
 import tkinter
 import Board
+import Building
 import Location
 import Market
 import Tower
@@ -161,6 +162,7 @@ class BoardCanvas(tkinter.Tk):
                     (y1 + y2) // 2,
                     width=GRID_GAP//4)
         self.can.itemconfig(image_id, fill=color)
+        return image_id
 
     def place_wall(self, side, index, image_id):
         """Places a wall to the save grid, 'N' is North, 'E' is East, 'S' is
@@ -348,7 +350,7 @@ class BoardCanvas(tkinter.Tk):
                 rooftops.append(Building.get_rooftop_location(building))
                 rooftop_colors[Building.get_rooftop_location(building)] = Building.get_owner_color(building)[0]
 
-        for key in self.drawn_edges:
+        for key in list(self.drawn_edges.keys()):
             if key not in edges:
                 self.can.delete(self.drawn_edges[key])
                 del self.drawn_edges[key]
