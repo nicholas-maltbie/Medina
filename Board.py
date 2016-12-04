@@ -108,9 +108,9 @@ def get_stable_piece_location(board):
         temp = set(get_building_peice_attach(building))
         for building2 in get_buildings(board):
             if building2 != building:
-                temp -= set(get_building_and_stables(building))
-                temp -= set(get_building_stable_adjacent(building))
-        possible += temp
+                temp = temp.difference(set(get_building_and_stables(building2)))
+                temp = temp.difference(set(get_building_stable_adjacent(building2)))
+        possible = possible.union(temp)
     well = get_well(board)
     if well in possible:
         possible.remove(well)

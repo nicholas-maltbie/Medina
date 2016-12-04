@@ -82,27 +82,10 @@ def get_possible_wall_additions(towers):
     """Gets all the possible addtions from each tower."""
     possible = []
     for i in range(1, 5):
-        tower = get_tower(towers, i)
-        h_mod = -1
-        v_mod = -1
-        num = i
-        if num == 0 or num == 2:
-            h_mod = 1
-        if num == 0 or num == 1:
-            v_mod = 1
-        start = make_location(-1, -1)
-        if num == 1:
-            start = make_location(-1, get_columns(towers))
-        elif num == 2:
-            start = make_location(get_rows(towers), -1)
-        elif num == 3:
-            start = make_location(get_rows(towers), get_columns(towers))
-        tower = get_tower(towers, num)
-
         if can_add_c(towers, i):
-            possible.append(get_translate(start, 0, h_mod * (get_tower_wall_h(tower) + 1)))
+            possible.append(get_tower_addition_c(towers, i))
         if can_add_r(towers, i):
-            possible.append(get_translate(start, v_mod * (get_tower_wall_v(tower) + 1), 0))
+            possible.append(get_tower_addition_r(towers, i))
     return possible
 
 def can_add_c(towers, tower_number):
@@ -111,10 +94,10 @@ def can_add_c(towers, tower_number):
     assert 1 <= tower_number <= 4
     if tower_number % 2 == 0:
         return get_tower_wall_h(get_tower(towers, tower_number)) + \
-            get_tower_wall_h(get_tower(towers, tower_number - 1)) < get_rows(towers) - 1
+            get_tower_wall_h(get_tower(towers, tower_number - 1)) < get_columns(towers) - 1
     else:
         return get_tower_wall_h(get_tower(towers, tower_number)) + \
-            get_tower_wall_h(get_tower(towers, tower_number + 1)) < get_rows(towers) - 1
+            get_tower_wall_h(get_tower(towers, tower_number + 1)) < get_columns(towers) - 1
 
 def can_add_r(towers, tower_number):
     """Checks if an addition can be made to a tower on the vertical wall.
@@ -122,10 +105,44 @@ def can_add_r(towers, tower_number):
     assert 1 <= tower_number <= 4
     if tower_number <= 2:
         return get_tower_wall_v(get_tower(towers, tower_number)) + \
-            get_tower_wall_v(get_tower(towers, tower_number + 2)) < get_columns(towers) - 1
+            get_tower_wall_v(get_tower(towers, tower_number + 2)) < get_rows(towers) - 1
     else:
         return get_tower_wall_v(get_tower(towers, tower_number)) + \
-            get_tower_wall_v(get_tower(towers, tower_number - 2)) < get_columns(towers) - 1
+            get_tower_wall_v(get_tower(towers, tower_number - 2)) < get_rows(towers) - 1
+
+def get_tower_addition_r(towers, num):
+    """Gets the locaiton of the next tower addition for the rows of this tower.
+    This does not check the validity of a move."""
+    tower = get_tower(towers, num)
+    num -= 1
+    v_mod = -1
+    if num == 0 or num == 1:
+        v_mod = 1
+    start = make_location(-1, -1)
+    if num == 1:
+        start = make_location(-1, get_columns(towers))
+    elif num == 2:
+        start = make_location(get_rows(towers), -1)
+    elif num == 3:
+        start = make_location(get_rows(towers), get_columns(towers))
+    return get_translate(start, v_mod * (get_tower_wall_v(tower) + 1), 0)
+
+def get_tower_addition_c(towers, num):
+    """Gets the location of the next towe raddition for the columns of this tower.
+    This does not check the validity of a move."""
+    tower = get_tower(towers, num)
+    h_mod = -1
+    num -= 1
+    if num == 0 or num == 2:
+        h_mod = 1
+    start = make_location(-1, -1)
+    if num == 1:
+        start = make_location(-1, get_columns(towers))
+    elif num == 2:
+        start = make_location(get_rows(towers), -1)
+    elif num == 3:
+        start = make_location(get_rows(towers), get_columns(towers))
+    return get_translate(start, 0, h_mod * (get_tower_wall_h(tower) + 1))
 
 def make_tower(number):
     """Creates a tower with a given number."""
