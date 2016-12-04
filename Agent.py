@@ -45,7 +45,6 @@ def get_all_possible_moves(player, board):
         building = Board.get_active_building(board, color)
         has_claimed = False
         for building in Board.get_buildings_by_color(board, color):
-            print(Player.get_player_name(player), (Building.get_owner(building))
             if Building.get_owner(building) == Player.get_player_name(player):
                 has_claimed = True
         if not has_claimed and building != None:
