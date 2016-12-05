@@ -7,21 +7,14 @@ all types of moves as there are many similar moves of the same type such as
 placing buildings or stables).
 
 A agent only needs to be the following function:
-make_decision(board, current, num_moves, players)
+make_decision(board, current, players, tile_supply, num_moves)
     - board is the game board
-    - current is the player making the move
-    - num_moves is the number of moves the agent can make
+    - current is the player making the move (index)
     - players are the players in the game
+    - tile_supply the game's tile supply
+    - num_moves is the number of moves the agent can make
 
-This function must return a list of moves that the player makes.
-
-If players in None, it represents a limited decision. If players is the list
-of all players in the game, it represents a normal decision.
-
-The difference between a normal decision and a limited decision is a limited
-decision is made without knowledge of the other players' hands (as the game is
-normally played) while make_decision allows the AI to cheat (or act like a
-person who has very good memory)."""
+This function must return a list of moves that the player makes."""
 
 import Move
 import Board
@@ -74,10 +67,35 @@ def get_all_possible_moves(player, board):
 
     return possible
 
-def apply_move(move, board, player_index, players):
+def apply_move(move, board, tile_supply, player_index, players):
     """Applys a given move to a board and returns a new board with the move
     applyed to it. The original board remains unchanged."""
+    def get_tile_from_supply(tile_supply, tile_type, value=0):
+        """Gets a tile from the supply"""
+        for i in range(len(tile_supply)):
+            tile = tile_supply[i]
+            if Tile.get_tile_value(tile) == value and Tile.get_tile_type(tile) == tile_type:
+                return tile_supply.pop(i)
+        return None
+
+    def get_tile_from_others(players, player_index, tile_type, value=0):
+        """Gets a tile from other players, player_index is the current player"""
+        for other in players:
+            if other != players[player_index]:
+                taken = Player.take_tile(other, tile_type, value)
+                if taken != None:
+                    return taken
+        return None
+
+    def get_adj_towers_to_building(towers, building):
+        """Gets all the towers adjacent to the building. Returns the tower
+        numbers of the adjacent towers."""
+        for num in range(1, 5):
+            tower = Tower.get_tower(towers, num)
+            
+
     board = Board.clone_board(board)
+    tile_supply = [Tile.clone_tile(tile) for tile in tile_supply]
     players = [Player.clone_player(player) for player in players]
     player = players[player_index]
     if Move.get_move_type(move) == Move.NONE_POSSIBLE:
@@ -120,17 +138,17 @@ def apply_move(move, board, player_index, players):
                 for player in players:
                     Player.remvoe_all_buildings_of_color(player, color)
             if is_largest:
-                for other in players:
-                    if other != player:
-                        Player.lose_tile(other, Tile.PALACE_TILE, Tile.PALACE_VALUES[color])
-                    else:
-                        Player.give_tile(player, Tile.make_tile(Tile.PALACE_TILE, Tile.PALACE_VALUES[color]))
+                from_supply = get_tile_from_supply(tile_supply, Tile.PALACE_TILE, Tile.PALACE_VALUES[color])
+                if from_supply != None:
+                    Player.give_tile(player, from_supply)
+                else:
+                    from_others = get_tile_from_others(players, player_index, Tile.PALACE_TILE, Tile.PALACE_VALUES[color])
+                    Player.give_tile(player, from_others)
 
             if color == TEA_COLOR:
                 num = len(Board.get_buildings_by_color(board, TEA_COLOR))
                 for i in range(4 - num):
-                    Player.give_tile(player, Tile.make_tile(Tile.TEA_TILE))
-
+                    Player.give_tile(player, get_tile_from_supply(tile_supply, Tile.TEA_TILE))
         elif piece == Move.WALL:
             towers = Board.get_towers(board)
             Player.play_wall(player)
@@ -140,20 +158,20 @@ def apply_move(move, board, player_index, players):
                     Tower.add_tower_c(tower)
                 elif loc == (Tower.get_tower_addition_r(towers, num)):
                     Tower.add_tower_r(tower)
-    return board, players
+    return board, players, tile_supply
 
-def get_agent_moves(agent, board, current, num_moves=2, players=None):
+def get_agent_moves(agent, board, current, tile_supply, players, num_moves=2):
     """Gets the moves made by an agent for his/her/it's turn."""
-    return agent(board, current, num_moves, players)
+    return agent(board, current, players, tile_supply, num_moves)
 
 def get_random_agent():
     """A random agent for testing the functionality of the agent."""
     import random
-    def make_moves(board, player_index, num_moves, players):
+    def make_moves(board, player_index, players, tile_supply, num_moves):
         moves = []
         for i in range(num_moves):
             move = random.choice(get_all_possible_moves(players[player_index], board))
-            board, players = apply_move(move, board, player_index, players)
+            board, players, tile_supply = apply_move(move, board, tile_supply, player_index, players)
             moves.append(move)
         return moves;
     return make_moves;

@@ -32,6 +32,10 @@ PALACE_TILE = 'PAL'
 PALACE_VALUES = {BUILDINGS_COLORS[i]:i+1 for i in range(4)}
 PALACE_COLORS = {i+1:BUILDINGS_COLORS[i] for i in range(4)}
 
+def get_all_tiles():
+    """Gets a new set of tiles for a game"""
+    return get_tower_tiles() + get_palace_tiles() + get_tea_tiles()
+
 def get_tower_tiles():
     """Gets all the tower tiles in the game"""
     return [make_tile(TOWER_TILE, value+1) for value in range(4)]

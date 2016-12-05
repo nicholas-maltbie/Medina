@@ -143,6 +143,16 @@ def get_num_tiles(player):
     """Gets the number of tiles held by a player."""
     return len(get_tiles(player))
 
+def take_tile(player, tile_type, value):
+    """Takes a tile from a player of a given type and value. This will return
+    the tile removed. If the player does not have a tile of the given type and
+    value, None is returned."""
+    tiles = get_tiles(player)
+    for index in range(len(tiles)):
+        if get_tile_type(tiles[index]) == tile_type and get_tile_value(tiles[index]) == value:
+            return tiles.pop(index)
+    return None
+
 def lose_tile(player, tile_type, value):
     """Takes away one tile of type tile_type and value value from player. If
     the player does not have any tiles of tile_type and value, nothing will
