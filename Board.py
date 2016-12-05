@@ -111,6 +111,10 @@ def get_stable_piece_location(board):
                 temp = temp.difference(set(get_building_and_stables(building2)))
                 temp = temp.difference(set(get_building_stable_adjacent(building2)))
         possible = possible.union(temp)
+    for street in get_market(board):
+        for loc in street:
+            if loc in possible:
+                possible.remove(loc)
     well = get_well(board)
     if well in possible:
         possible.remove(well)

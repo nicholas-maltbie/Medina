@@ -46,7 +46,8 @@ def get_all_possible_moves(player, board):
         for building in Board.get_buildings_by_color(board, color):
             if Building.get_owner(building) == Player.get_player_name(player):
                 has_claimed = True
-        if not has_claimed and building != None:
+        if not has_claimed and Board.get_active_building(board, color) != None and \
+                not Building.has_owner(Board.get_active_building(board, color)):
             for loc in Building.get_building_locations(building):
                 possible.append(Move.make_move(Player.get_player_name(player), Move.NORMAL, Move.ROOFTOP, loc, color))
     for loc in Board.get_stable_piece_location(board):

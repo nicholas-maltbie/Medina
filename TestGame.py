@@ -15,7 +15,7 @@ board_canvas.setup()
 
 def play_game(board, board_canvas):
     import time
-    time.sleep(3)
+    time.sleep(1)
     colors = ['Blue', 'Green', 'Yellow', 'Red']
     names = ['Nick', 'Zach', 'Brian', 'Aaron']
     players = [Player.make_player(names[i], 4, colors[i]) for i in range(4)]
@@ -58,17 +58,27 @@ def play_game(board, board_canvas):
             print(move)
             board, players = Agent.apply_move(move, board, current_player, players)
             board_canvas.board = board
+            board_canvas.check_well
             board_canvas.update_board()
-            time.sleep(0.5)
-        if game_over(board, players) or all_pass:
+            #time.sleep(0.5)
+        if  all_pass:
             no_moves += 1
         else:
             no_moves == 0
 
-        if no_moves == len(players):
-            return board_canvas.update_board()
+        if no_moves == len(players) or game_over(board, players):
+            board_canvas.update_board()
+            time.sleep(3)
+            board = Board.make_board(11,16)
+            thread = threading.Thread(target = play_game, args=[board, board_canvas])
+            board_canvas.board = board
+            board_canvas.clear_board()
+            board_canvas.check_well()
+            board_canvas.update_board()
+            thread.start()
+            return
         current_player = (current_player + 1) % len(players)
-        time.sleep(1)
+        #time.sleep(0.1)
         #print(board)
 
 thread = threading.Thread(target = play_game, args=[board, board_canvas])

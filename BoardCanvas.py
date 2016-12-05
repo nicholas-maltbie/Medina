@@ -298,7 +298,31 @@ class BoardCanvas(tkinter.Tk):
             elif side == 'W':
                 side_index = 3
             self.can.delete(item[1])
-            return self.placed_walls[side_index][index] == None
+            self.placed_walls[side_index][index] = None
+
+    def clear_board(self):
+        """Removes all currently drawn elements form the board"""
+        for row in range(self.rows):
+            for col in range(self.columns):
+                self.remove_piece(Location.make_location(row, col))
+        for col in range(self.columns):
+            self.remove_wall('N', col)
+            self.remove_wall('S', col)
+        for row in range(self.rows):
+            self.remove_wall('E', row)
+            self.remove_wall('W', row)
+        for key in list(self.drawn_edges.keys()):
+            self.can.delete(self.drawn_edges[key])
+            del self.drawn_edges[key]
+        for key in list(self.drawn_rooftops.keys()):
+            self.can.delete(self.drawn_rooftops[key])
+            del self.drawn_rooftops[key]
+
+    def check_well(self):
+        """Checks if the well is placed in the correct spot"""
+        well = Board.get_well(self.board)
+        self.well = self.can.create_image(self.get_board_pixels(well), image = self.well_image)
+        self.place_piece(well, "WELL", self.well)
 
     def update_board(self):
         """Updates the displayed board based on self.board"""
@@ -314,6 +338,7 @@ class BoardCanvas(tkinter.Tk):
         edge_colors = {}
         rooftops = []
         rooftop_colors = {}
+
         for building in Board.get_buildings(self.board):
             color = Building.get_building_color(building)
             all_locs = Building.get_building_and_stables(building)
@@ -358,7 +383,7 @@ class BoardCanvas(tkinter.Tk):
             if edge not in self.drawn_edges:
                 self.drawn_edges[edge] = self.draw_edge(edge, PLAYER_COLORS_HEX[edge_colors[edge]])
 
-        for key in self.drawn_rooftops:
+        for key in list(self.drawn_rooftops.keys()):
             if key not in rooftops:
                 self.can.delete(self.drawn_rooftops[key])
                 del self.drawn_rooftops[key]
