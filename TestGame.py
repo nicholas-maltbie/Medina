@@ -55,12 +55,15 @@ def play_game(board, board_canvas):
         for move in selected:
             if Move.get_move_type(move) != Move.NONE_POSSIBLE:
                 all_pass = False
-            print(move)
+            #print(move)
             board, players = Agent.apply_move(move, board, current_player, players)
             board_canvas.board = board
             board_canvas.check_well
             board_canvas.update_board()
             #time.sleep(0.5)
+
+        print(Player.get_player_color(players[current_player]), Player.get_tiles(players[current_player]))
+
         if  all_pass:
             no_moves += 1
         else:
@@ -78,7 +81,8 @@ def play_game(board, board_canvas):
             thread.start()
             return
         current_player = (current_player + 1) % len(players)
-        #time.sleep(0.1)
+        #time.sleep(1)
+        input()
         #print(board)
 
 thread = threading.Thread(target = play_game, args=[board, board_canvas])

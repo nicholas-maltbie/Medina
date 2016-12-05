@@ -54,7 +54,7 @@ def clone_player(player):
             'stables':get_num_stables(player), 'rooftops':get_held_rooftops(player),
             'merchants':get_held_merchants(player),'walls': get_held_walls(player),
             'color':get_player_color(player),
-            'tiles':[Tile.clone_tile(tile) for tile in get_tiles(player)]}
+            'tiles':[clone_tile(tile) for tile in get_tiles(player)]}
 
 def get_num_stables(player):
     """Gets the number of stables a player has"""

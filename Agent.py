@@ -33,6 +33,8 @@ import Tile
 import Location
 import GameConstants
 
+TEA_COLOR = GameConstants.BUILDINGS_COLORS[1]
+
 def get_all_possible_moves(player, board):
     """Gets all the differnt VALID moves that a player can be made in a board.
     If there are no valid moves, a move of NONE_POSSIBLE will be returned."""
@@ -103,15 +105,32 @@ def apply_move(move, board, player_index, players):
         elif piece == Move.ROOFTOP:
             color = Move.get_move_color(move)
             Player.play_rooftop(player)
-            Building.assign_owner(Board.get_active_building(board, color), Player.get_player_name(player), Player.get_player_color(player), loc)
+            claimed_building = Board.get_active_building(board, color)
+            Building.assign_owner(claimed_building, Player.get_player_name(player), Player.get_player_color(player), loc)
             Board.get_buildings_by_color(board, color)
             claimed = []
+            size = len(Building.get_building_locations(claimed_building))
+            is_largest = True
             for building in Board.get_buildings_by_color(board, color):
                 if Building.has_owner(building) and Building.get_owner(building) != Building.NEUTRAL_OWNER:
                     claimed.append(Building.get_owner(building))
+                if claimed_building != building and len(Building.get_building_locations(building)) >= size:
+                    is_largest = False
             if len(claimed) == len(players):
                 for player in players:
                     Player.remvoe_all_buildings_of_color(player, color)
+            if is_largest:
+                for other in players:
+                    if other != player:
+                        Player.lose_tile(other, Tile.PALACE_TILE, Tile.PALACE_VALUES[color])
+                    else:
+                        Player.give_tile(player, Tile.make_tile(Tile.PALACE_TILE, Tile.PALACE_VALUES[color]))
+
+            if color == TEA_COLOR:
+                num = len(Board.get_buildings_by_color(board, TEA_COLOR))
+                for i in range(4 - num):
+                    Player.give_tile(player, Tile.make_tile(Tile.TEA_TILE))
+
         elif piece == Move.WALL:
             towers = Board.get_towers(board)
             Player.play_wall(player)
