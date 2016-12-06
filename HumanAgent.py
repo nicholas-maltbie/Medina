@@ -4,6 +4,7 @@ pieces so a human agent can play pieces on the board from his or her hand"""
 import Board
 import BoardCanvas
 import Player
+import Tile
 import GameConstants
 import threading
 
@@ -18,13 +19,14 @@ def make_human_agent(board_canvas, player):
 
 if __name__ == "__main__":
     board = Board.make_board(11, 16)
+    tile_supply = Tile.get_all_tiles()
     player = Player.make_player("Nick", 4, "Green")
 
     grid = BoardCanvas.GRID_SIZE
     gap = BoardCanvas.GRID_GAP
     board_canvas = None
 
-    board_canvas = BoardCanvas.BoardCanvas(board, additional_x= grid * 10)
+    board_canvas = BoardCanvas.BoardCanvas(board, tile_supply, additional_x= grid * 10)
     board_canvas.setup()
 
     offy = gap + grid // 2

@@ -12,7 +12,7 @@ import Move
 
 board = Board.make_board(11,16)
 tile_supply = Tile.get_all_tiles()
-board_canvas = BoardCanvas.BoardCanvas(board)
+board_canvas = BoardCanvas.BoardCanvas(board, tile_supply)
 board_canvas.setup()
 
 def play_game(board, tile_supply, board_canvas):
@@ -60,6 +60,7 @@ def play_game(board, tile_supply, board_canvas):
             #print(move)
             board, players, tile_supply = Agent.apply_move(move, board, tile_supply, current_player, players)
             board_canvas.board = board
+            board_canvas.tile_supply = tile_supply
             board_canvas.check_well
             board_canvas.update_board()
             #time.sleep(0.5)
@@ -88,7 +89,7 @@ def play_game(board, tile_supply, board_canvas):
             thread.start()
             return
         current_player = (current_player + 1) % len(players)
-        #time.sleep(1)
+        time.sleep(1)
         #input()
         #print(board)
 
