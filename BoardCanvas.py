@@ -61,6 +61,7 @@ class BoardCanvas(tkinter.Tk):
         self.drawn_edges = {}
         self.drawn_rooftops = {}
         self.drawn_tower_tiles = {}
+        self.drawn_tower_merchants = {}
         self.drawn_palace_tiles = {}
         self.drawn_tea_tiles = {}
 
@@ -156,6 +157,7 @@ class BoardCanvas(tkinter.Tk):
                     self.tower_images[num].width() // (GRID_SIZE * 2), self.tower_images[num].height() // (GRID_SIZE * 2))
 
         self.tea_image = tkinter.PhotoImage(file = "Assets/Tea_Tile.gif")
+        self.tea_image = self.tea_image.subsample(self.tea_image.width() // (GRID_SIZE * 2), self.tea_image.height() // (GRID_SIZE * 2))
 
         self.update_board()
 
@@ -367,10 +369,14 @@ class BoardCanvas(tkinter.Tk):
         rooftop_colors = {}
         tower_tiles = {}
         palace_tiles = {}
+        tea_tiles = {}
+        tower_merchants = []
 
         temp_tiles = [tile for tile in self.tile_supply if Tile.get_tile_type(tile) == Tile.TOWER_TILE]
         for t in temp_tiles:
             tower_tiles[Tile.get_tile_value(t)] = t
+            tower_merchants.extend([(Tile.get_tile_value(t), m) for m in range(Tile.get_num_merchants(t))])
+        #print(tower_merchants)
         for key in list(self.drawn_tower_tiles.keys()):
             if key not in tower_tiles:
                 self.can.delete(self.drawn_tower_tiles[key])
@@ -378,6 +384,14 @@ class BoardCanvas(tkinter.Tk):
         for t in temp_tiles:
             if Tile.get_tile_value(t) not in self.drawn_tower_tiles:
                 self.drawn_tower_tiles[Tile.get_tile_value(t)] = self.draw_tower_tile(Tile.get_tile_value(t))
+        for key in list(self.drawn_tower_merchants.keys()):
+            if key not in tower_merchants:
+                self.can.delete(self.drawn_tower_merchants[key])
+                del self.drawn_tower_merchants[key]
+        for merchant in tower_merchants:
+            if merchant not in self.drawn_tower_merchants:
+                self.drawn_tower_merchants[merchant] = self.draw_tower_tile_merchant(merchant[0], merchant[1])
+
         temp_tiles = [tile for tile in self.tile_supply if Tile.get_tile_type(tile) == Tile.PALACE_TILE]
         for t in temp_tiles:
             palace_tiles[Tile.get_tile_value(t)] = t
@@ -388,6 +402,17 @@ class BoardCanvas(tkinter.Tk):
         for t in temp_tiles:
             if Tile.get_tile_value(t) not in self.drawn_palace_tiles:
                 self.drawn_palace_tiles[Tile.get_tile_value(t)] = self.draw_palace_tile(Tile.get_tile_value(t))
+
+        temp_tiles = [tile for tile in self.tile_supply if Tile.get_tile_type(tile) == Tile.TEA_TILE]
+        for i in range(len(temp_tiles)):
+            tea_tiles[i] = temp_tiles[i]
+        for key in list(self.drawn_tea_tiles.keys()):
+            if key not in tea_tiles:
+                self.can.delete(self.drawn_tea_tiles[key])
+                del self.drawn_tea_tiles[key]
+        for i in range(len(temp_tiles)):
+            if i not in self.drawn_tea_tiles:
+                self.drawn_tea_tiles[i] = self.draw_tea_tile(i)
 
         for building in Board.get_buildings(self.board):
             color = Building.get_building_color(building)
@@ -467,7 +492,12 @@ class BoardCanvas(tkinter.Tk):
 
     def draw_tea_tile(self, tea_num):
         """Draws a tea tile and returns the image id"""
-        pass
+        loc1, loc2 = (Location.make_location(-1, -4), Location.make_location(2, -1))
+        x1, y1 = self.get_board_pixels(loc1)
+        x2, y2 = self.get_board_pixels(loc2)
+        x_center = (x1 + x2) / 2
+        y_center = (y1 + y2) / 2 + GRID_GAP * (tea_num + 1) + GRID_SIZE * tea_num
+        return self.can.create_image((x_center, y_center), image= self.tea_image)
 
     def draw_palace_tile(self, palace_num):
         """Draws a palace tile and returns the image id"""
@@ -483,6 +513,19 @@ class BoardCanvas(tkinter.Tk):
         """Draws a tower tile and returns the image id"""
         return self.can.create_image(self.get_tower_tile_center(tower_num),
                 image = self.tower_images[tower_num])
+
+    def draw_tower_tile_merchant(self, tower_num, merchant_num):
+        """Draws merchants for a tower tile"""
+        x, y = self.get_tower_tile_center(tower_num)
+        if merchant_num % 2 == 0:
+            x -= (GRID_SIZE + GRID_GAP) / 2
+        else:
+            x += (GRID_SIZE + GRID_GAP) / 2
+        if merchant_num < 2:
+            y -= (GRID_SIZE + GRID_GAP) / 2
+        else:
+            y += (GRID_SIZE + GRID_GAP) / 2
+        return self.can.create_image((x, y), image = self.merchant_image)
 
     def get_tower_tile_center(self, tower_num):
         """Gets the center of a tower tile location"""
