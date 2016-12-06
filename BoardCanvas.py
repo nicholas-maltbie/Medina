@@ -7,6 +7,7 @@ import Board
 import Building
 import Location
 import Market
+import Tile
 import Tower
 from Move import *
 from GameConstants import *
@@ -45,19 +46,23 @@ class BoardCanvas(tkinter.Tk):
         """Gets the height of the board from tower to tower"""
         return self.board_height
 
-    def __init__(self, board, additional_x=0, additional_y=0):
+    def __init__(self, board, tile_supply, additional_x=0, additional_y=0):
         tkinter.Tk.__init__(self)
-        self.board_width = GRID_SIZE * (Board.get_columns(board) + 2*wallSize + 4) + GRID_GAP * (Board.get_columns(board) + 2*wallSize + 4)
-        self.board_height = GRID_SIZE * (Board.get_rows(board) + 2*wallSize + 6) + GRID_GAP * (Board.get_rows(board) + 2*wallSize + 6)
+        self.board_width = GRID_SIZE * (Board.get_columns(board) + 2*wallSize + 6) + GRID_GAP * (Board.get_columns(board) + 2*wallSize + 5)
+        self.board_height = GRID_SIZE * (Board.get_rows(board) + 2*wallSize + 6) + GRID_GAP * (Board.get_rows(board) + 2*wallSize + 4)
         self.can = tkinter.Canvas(width=self.board_width + additional_x, height=self.board_height + additional_y)
 
         self.drag_data = drag_data = {"x": 0, "y": 0, "item": None, "piece": None, "data": None}
         self.listeners = []
         self.moveable_items = {}
         self.board = board
+        self.tile_supply = tile_supply
         self.can.pack()
         self.drawn_edges = {}
         self.drawn_rooftops = {}
+        self.drawn_tower_tiles = {}
+        self.drawn_palace_tiles = {}
+        self.drawn_tea_tiles = {}
 
         self.tower_image = tkinter.PhotoImage(file="Assets/Tower.gif")
         self.tower_image = self.tower_image.subsample(self.tower_image.width() // GRID_SIZE, self.tower_image.height() // GRID_SIZE)
@@ -85,7 +90,7 @@ class BoardCanvas(tkinter.Tk):
         max_x = GRID_GAP * (columns) + GRID_SIZE * (columns + 1)
         max_y = GRID_GAP * (rows) + GRID_SIZE * (rows + 1)
 
-        self.offx, self.offy = GRID_SIZE * 3 + GRID_GAP * 3, GRID_SIZE * 3 + GRID_GAP * 3
+        self.offx, self.offy = GRID_SIZE * 4 + GRID_GAP * 3, GRID_SIZE * 4 + GRID_GAP * 3
 
         self.columns = Board.get_columns(board)
         self.rows = Board.get_rows(board)
@@ -108,6 +113,11 @@ class BoardCanvas(tkinter.Tk):
         ]
 
     def setup(self):
+        self.tower_locs = [(Location.make_location(-4, -4), Location.make_location(-1, -1)),
+                (Location.make_location(-4, self.columns), Location.make_location(-1, self.columns + 3)),
+                (Location.make_location(self.rows, -4), Location.make_location(self.rows + 3, -1)),
+                (Location.make_location(self.rows, self.columns), Location.make_location(self.rows + 3, self.columns + 3))]
+
         board = self.board
         if self.merchant_image == None:
             self.merchant_image = tkinter.PhotoImage(file = "Assets/Merchant.gif")
@@ -132,6 +142,20 @@ class BoardCanvas(tkinter.Tk):
             self.rooftop_images[color[0]] = tkinter.PhotoImage(file = "Assets/Rooftop_" + color[0] + ".gif")
             self.rooftop_images[color[0]] = self.rooftop_images[color[0]].subsample( \
                     self.rooftop_images[color[0]].width() // GRID_SIZE, self.rooftop_images[color[0]].height() // GRID_SIZE)
+
+        self.palace_images = {}
+        for color in BUILDINGS_COLORS:
+            self.palace_images[color[0]] = tkinter.PhotoImage(file = "Assets/Palace_Tile_" + color[0]  + ".gif")
+            self.palace_images[color[0]] = self.palace_images[color[0]].subsample( \
+                    self.palace_images[color[0]].width() // (GRID_SIZE * 2), self.palace_images[color[0]].height() // (GRID_SIZE * 2))
+
+        self.tower_images = {}
+        for num in range(1, 5):
+            self.tower_images[num] = tkinter.PhotoImage(file = "Assets/Tower_Tile_" + str(num)  + ".gif")
+            self.tower_images[num] = self.tower_images[num].subsample( \
+                    self.tower_images[num].width() // (GRID_SIZE * 2), self.tower_images[num].height() // (GRID_SIZE * 2))
+
+        self.tea_image = tkinter.PhotoImage(file = "Assets/Tea_Tile.gif")
 
         self.update_board()
 
@@ -341,6 +365,29 @@ class BoardCanvas(tkinter.Tk):
         edge_colors = {}
         rooftops = []
         rooftop_colors = {}
+        tower_tiles = {}
+        palace_tiles = {}
+
+        temp_tiles = [tile for tile in self.tile_supply if Tile.get_tile_type(tile) == Tile.TOWER_TILE]
+        for t in temp_tiles:
+            tower_tiles[Tile.get_tile_value(t)] = t
+        for key in list(self.drawn_tower_tiles.keys()):
+            if key not in tower_tiles:
+                self.can.delete(self.drawn_tower_tiles[key])
+                del self.drawn_tower_tiles[key]
+        for t in temp_tiles:
+            if Tile.get_tile_value(t) not in self.drawn_tower_tiles:
+                self.drawn_tower_tiles[Tile.get_tile_value(t)] = self.draw_tower_tile(Tile.get_tile_value(t))
+        temp_tiles = [tile for tile in self.tile_supply if Tile.get_tile_type(tile) == Tile.PALACE_TILE]
+        for t in temp_tiles:
+            palace_tiles[Tile.get_tile_value(t)] = t
+        for key in list(self.drawn_palace_tiles.keys()):
+            if key not in palace_tiles:
+                self.can.delete(self.drawn_palace_tiles[key])
+                del self.drawn_palace_tiles[key]
+        for t in temp_tiles:
+            if Tile.get_tile_value(t) not in self.drawn_palace_tiles:
+                self.drawn_palace_tiles[Tile.get_tile_value(t)] = self.draw_palace_tile(Tile.get_tile_value(t))
 
         for building in Board.get_buildings(self.board):
             color = Building.get_building_color(building)
@@ -418,6 +465,30 @@ class BoardCanvas(tkinter.Tk):
         if self.drag_data["item"] != None:
             self.can.tag_raise(self.drag_data["item"])
 
+    def draw_tea_tile(self, tea_num):
+        """Draws a tea tile and returns the image id"""
+        pass
+
+    def draw_palace_tile(self, palace_num):
+        """Draws a palace tile and returns the image id"""
+        half = self.get_board_width() // 2
+        x1, x2 = half - (GRID_GAP * 5 + GRID_SIZE * 4), half + (GRID_GAP * 5 + GRID_SIZE * 4)
+        x_temp, y1 = self.get_board_pixels(Location.make_location(-4, 0))
+        x_temp, y2 = self.get_board_pixels(Location.make_location(-1, 0))
+        x_center = x1 + GRID_SIZE * 2 * (palace_num - 1) + GRID_SIZE * 3 / 2 + GRID_GAP * (palace_num)
+        y_center = (y1 + y2) / 2
+        return self.can.create_image((x_center, y_center), image = self.palace_images[Tile.PALACE_COLORS[palace_num][0]])
+
+    def draw_tower_tile(self, tower_num):
+        """Draws a tower tile and returns the image id"""
+        return self.can.create_image(self.get_tower_tile_center(tower_num),
+                image = self.tower_images[tower_num])
+
+    def get_tower_tile_center(self, tower_num):
+        """Gets the center of a tower tile location"""
+        (x1, y1), (x2, y2) = [self.get_board_pixels(loc) for loc in self.tower_locs[tower_num - 1]]
+        return (x1 + x2) // 2, (y1 + y2) // 2
+
     def draw_grid_lines(self):
         """Draws lines for the different grid boxes on the screen"""
         x1,y1 = self.get_board_pixels(Location.make_location(0,0))
@@ -438,6 +509,53 @@ class BoardCanvas(tkinter.Tk):
                 y1 - (GRID_SIZE + GRID_GAP) // 2, \
                 x2 - (GRID_SIZE + GRID_GAP) // 2 + WALL_WIDTH, \
                 y2 - (GRID_SIZE + GRID_GAP) // 2)
+
+        for loc1, loc2 in [(Location.make_location(-3, -3), Location.make_location(-1, -1)),
+                    (Location.make_location(-3, self.columns + 1), Location.make_location(-1, self.columns + 3)),
+                    (Location.make_location(self.rows + 1, -3), Location.make_location(self.rows + 3, -1)),
+                    (Location.make_location(self.rows + 1, self.columns + 1), Location.make_location(self.rows + 3, self.columns + 3)),
+                    (Location.make_location(0, -3), Location.make_location(7, -1))]:
+            x1,y1 = self.get_board_pixels(loc1)
+            x2,y2 = self.get_board_pixels(loc2)
+            self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x2 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y1 - (GRID_SIZE + GRID_GAP) // 2)
+            self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y2 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x2 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y2 - (GRID_SIZE + GRID_GAP) // 2)
+            self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x1 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y2 - (GRID_SIZE + GRID_GAP) // 2)
+            self.can.create_line(x2 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                    x2 - (GRID_SIZE + GRID_GAP) // 2, \
+                    y2 - (GRID_SIZE + GRID_GAP) // 2)
+        half = self.get_board_width() // 2
+        x1, x2 = half - (GRID_GAP * 5 + GRID_SIZE * 4), half + (GRID_GAP * 5 + GRID_SIZE * 4)
+        x_temp, y1 = self.get_board_pixels(Location.make_location(-3, 0))
+        x_temp, y2 = self.get_board_pixels(Location.make_location(-1, 0))
+        self.can.create_line(x1, \
+                y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                x2, \
+                y1 - (GRID_SIZE + GRID_GAP) // 2)
+        self.can.create_line(x1, \
+                y2 - (GRID_SIZE + GRID_GAP) // 2, \
+                x2, \
+                y2 - (GRID_SIZE + GRID_GAP) // 2)
+        self.can.create_line(x1, \
+                y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                x1, \
+                y2 - (GRID_SIZE + GRID_GAP) // 2)
+        self.can.create_line(x2, \
+                y1 - (GRID_SIZE + GRID_GAP) // 2, \
+                x2, \
+                y2 - (GRID_SIZE + GRID_GAP) // 2)
+
+
+
 
         for row in range(0, self.rows + 1):
             x1,y1 = 0,0
