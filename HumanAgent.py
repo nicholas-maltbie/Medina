@@ -62,7 +62,7 @@ if __name__ == "__main__":
         offx += grid + gap * 2
         if i % 6 == 0:
             offx = board_canvas.get_board_width() + gap + grid // 2
-            offy
+            offy += grid + gap
 
     offy += grid + gap
     offx = board_canvas.get_board_width() + gap + grid // 2

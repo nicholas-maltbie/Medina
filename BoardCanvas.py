@@ -14,9 +14,11 @@ from GameConstants import *
 """Size for the wall locations"""
 WALL_WIDTH = 30
 """Size of each grid square in pixels"""
-GRID_SIZE = 40
+GRID_SIZE = 34
 """Size of the gap between grid locations"""
-GRID_GAP = 10
+GRID_GAP = 8
+"""Size of walls in terms of grid_sizes"""
+wallSize = 1
 
 #Load different images
 BUILDING_IMAGES = {}
@@ -37,16 +39,17 @@ def get_second_point(edge):
 class BoardCanvas(tkinter.Tk):
     def get_board_width(self):
         """Gets the width of the board from tower to tower"""
-        return GRID_SIZE * (Board.get_columns(self.board) + 2) + GRID_GAP * (Board.get_columns(self.board) + 4)
+        return self.board_width
 
     def get_board_height(self):
         """Gets the height of the board from tower to tower"""
-        return GRID_SIZE * (Board.get_rows(self.board) + 2) + GRID_GAP * (Board.get_rows(self.board) + 3)
+        return self.board_height
 
     def __init__(self, board, additional_x=0, additional_y=0):
         tkinter.Tk.__init__(self)
-        self.can = tkinter.Canvas(width=(GRID_SIZE * (Board.get_columns(board) + 2) + GRID_GAP * (Board.get_columns(board) + 4)) + additional_x,
-            height=(GRID_SIZE * (Board.get_rows(board) + 2) + GRID_GAP * (Board.get_rows(board) + 3)) + additional_y)
+        self.board_width = GRID_SIZE * (Board.get_columns(board) + 2*wallSize + 4) + GRID_GAP * (Board.get_columns(board) + 2*wallSize + 4)
+        self.board_height = GRID_SIZE * (Board.get_rows(board) + 2*wallSize + 6) + GRID_GAP * (Board.get_rows(board) + 2*wallSize + 6)
+        self.can = tkinter.Canvas(width=self.board_width + additional_x, height=self.board_height + additional_y)
 
         self.drag_data = drag_data = {"x": 0, "y": 0, "item": None, "piece": None, "data": None}
         self.listeners = []
@@ -82,7 +85,7 @@ class BoardCanvas(tkinter.Tk):
         max_x = GRID_GAP * (columns) + GRID_SIZE * (columns + 1)
         max_y = GRID_GAP * (rows) + GRID_SIZE * (rows + 1)
 
-        self.offx, self.offy = GRID_SIZE + GRID_GAP * 2, GRID_SIZE + GRID_GAP * 2
+        self.offx, self.offy = GRID_SIZE * 3 + GRID_GAP * 3, GRID_SIZE * 3 + GRID_GAP * 3
 
         self.columns = Board.get_columns(board)
         self.rows = Board.get_rows(board)
