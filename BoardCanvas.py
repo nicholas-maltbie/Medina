@@ -76,14 +76,14 @@ class BoardCanvas(tkinter.Tk):
                 img = tkinter.PhotoImage(file="Assets/Building_" + color[0] + ".gif")
                 BUILDING_IMAGES[color] = img.subsample(img.width() // GRID_SIZE, img.height() // GRID_SIZE)
             img = tkinter.PhotoImage(file="Assets/Wall_North.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (GRID_SIZE)))
+            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (GRID_SIZE + GRID_GAP)))
             img = tkinter.PhotoImage(file="Assets/Wall_South.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (GRID_SIZE)))
+            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (GRID_SIZE + GRID_GAP)))
 
             img = tkinter.PhotoImage(file="Assets/Wall_East.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE), img.height() // (GRID_SIZE + GRID_GAP + 1)))
+            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP), img.height() // (GRID_SIZE + GRID_GAP + 1)))
             img = tkinter.PhotoImage(file="Assets/Wall_West.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE), img.height() // (GRID_SIZE + GRID_GAP + 1)))
+            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP), img.height() // (GRID_SIZE + GRID_GAP + 1)))
 
         rows = Board.get_rows(self.board)
         columns = Board.get_columns(self.board)
