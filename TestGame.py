@@ -17,7 +17,7 @@ board_canvas.setup()
 
 def play_game(board, tile_supply, board_canvas):
     import time
-    time.sleep(1)
+    #time.sleep(1)
     colors = ['Blue', 'Green', 'Yellow', 'Red']
     names = ['Nick', 'Zach', 'Brian', 'Aaron']
     players = [Player.make_player(names[i], 4, colors[i]) for i in range(4)]
@@ -64,7 +64,11 @@ def play_game(board, tile_supply, board_canvas):
             board_canvas.update_board()
             #time.sleep(0.5)
 
-        print(Player.get_player_color(players[current_player]), Player.get_tiles(players[current_player]))
+        #print(tile_supply)
+        #print(Player.get_player_color(players[current_player]), Player.get_tiles(players[current_player]))
+
+        #print([Tile.get_tile_value(tile) for tile in tile_supply if Tile.get_tile_type(tile) == Tile.TOWER_TILE],
+        #        [[Tile.get_tile_value(tile) for tile in Player.get_tiles(player) if Tile.get_tile_type(tile) == Tile.TOWER_TILE] for player in players])
 
         if  all_pass:
             no_moves += 1
@@ -73,7 +77,7 @@ def play_game(board, tile_supply, board_canvas):
 
         if no_moves == len(players) or game_over(board, players):
             board_canvas.update_board()
-            time.sleep(3)
+            #time.sleep(3)
             board = Board.make_board(11,16)
             tile_supply = Tile.get_all_tiles()
             thread = threading.Thread(target = play_game, args=[board, tile_supply, board_canvas])
@@ -84,7 +88,7 @@ def play_game(board, tile_supply, board_canvas):
             thread.start()
             return
         current_player = (current_player + 1) % len(players)
-        time.sleep(1)
+        #time.sleep(1)
         #input()
         #print(board)
 

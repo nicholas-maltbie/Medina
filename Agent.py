@@ -78,6 +78,14 @@ def apply_move(move, board, tile_supply, player_index, players):
                 return tile_supply.pop(i)
         return None
 
+    def get_tile_from_all(players, tile_type, value=0):
+        """Gets a tile from any of the players, returns the first tile found"""
+        for other in players:
+            taken = Player.take_tile(other, tile_type, value)
+            if taken != None:
+                return taken
+        return None
+
     def get_tile_from_others(players, player_index, tile_type, value=0):
         """Gets a tile from other players, player_index is the current player"""
         for other in players:
@@ -87,12 +95,46 @@ def apply_move(move, board, tile_supply, player_index, players):
                     return taken
         return None
 
+    def get_buildings_adjacent_to_tower(towers, num, board):
+        """Gets all the buildings adjacent to the tower's walls"""
+        walls = set(Tower.get_wall_locations_for_tower(towers, num - 1))
+        def is_building_adj(building):
+            """Checks if a building is adjacent to the tower"""
+            for loc in Building.get_building_stable_orthogonal(building):
+                if loc in walls:
+                    return True
+            return False
+        adj = []
+        for building in Board.get_buildings(board):
+            if is_building_adj(building):
+                adj.append(building)
+        return adj
+
+    def get_player_with_name(players, name):
+        """Gets a player with a given name and returns none if there are no
+        players with the given name."""
+        for player in players:
+            if Player.get_player_name(player) == name:
+                return player
+        return None
+
     def get_adj_towers_to_building(towers, building):
         """Gets all the towers adjacent to the building. Returns the tower
-        numbers of the adjacent towers."""
+        numbers of the adjacent towers as a list."""
+        building_adj = set(Building.get_building_stable_orthogonal(building))
+        def is_adj_to_tower(num):
+            """Checks if a given building is adjacent to the tower of number
+            tower_num from towers"""
+            tower_adj = Tower.get_wall_locations_for_tower(towers, num - 1)
+            for wall in tower_adj:
+                if wall in building_adj:
+                    return True
+            return False
+        connected = []
         for num in range(1, 5):
-            tower = Tower.get_tower(towers, num)
-            
+            if is_adj_to_tower(num):
+                connected.append(num)
+        return connected
 
     board = Board.clone_board(board)
     tile_supply = [Tile.clone_tile(tile) for tile in tile_supply]
@@ -116,7 +158,26 @@ def apply_move(move, board, tile_supply, player_index, players):
             Player.play_stable(player)
             for building in Board.get_buildings(board):
                 if loc in Building.get_building_peice_attach(building):
+                    before_adj = get_adj_towers_to_building(Board.get_towers(board), building)
                     Building.attach_stable_location(building, loc)
+                    after_adj = get_adj_towers_to_building(Board.get_towers(board), building)
+                    new_towers = []
+                    for t in after_adj:
+                        if t not in before_adj:
+                            new_towers.append(t)
+                    if Building.has_owner(building):
+                        new_owner = Building.get_owner(building)
+                        for num in set(new_towers):
+                            #we have a new owner
+                            tile = get_tile_from_supply(tile_supply, Tile.TOWER_TILE, num)
+                            if tile == None:
+                                tile = get_tile_from_all(players, Tile.TOWER_TILE, num)
+                            if new_owner == Building.NEUTRAL_OWNER:
+                                tile_supply.append(tile)
+                            else:
+                                new_owner = get_player_with_name(players, new_owner)
+                                Player.give_tile(new_owner, tile)
+
         elif piece == Move.MERCHANT:
             Player.play_merchant(player)
             Market.add_merchant_to_market(Board.get_market(board), loc)
@@ -149,15 +210,50 @@ def apply_move(move, board, tile_supply, player_index, players):
                 num = len(Board.get_buildings_by_color(board, TEA_COLOR))
                 for i in range(4 - num):
                     Player.give_tile(player, get_tile_from_supply(tile_supply, Tile.TEA_TILE))
+
+            adj = set(get_adj_towers_to_building(Board.get_towers(board), claimed_building))
+            for tower_num in adj:
+                tile = get_tile_from_supply(tile_supply, Tile.TOWER_TILE, tower_num)
+                if tile == None:
+                    tile = get_tile_from_all(players, Tile.TOWER_TILE, tower_num)
+                Player.give_tile(player, tile)
+
         elif piece == Move.WALL:
             towers = Board.get_towers(board)
             Player.play_wall(player)
             for num in range(1, 5):
                 tower = Tower.get_tower(towers, num)
+                added = False
+                before_adj = set()
                 if loc == (Tower.get_tower_addition_c(towers, num)):
+                    before_adj = get_buildings_adjacent_to_tower(Board.get_towers(board), num, board)
                     Tower.add_tower_c(tower)
+                    added = True
                 elif loc == (Tower.get_tower_addition_r(towers, num)):
+                    before_adj = get_buildings_adjacent_to_tower(Board.get_towers(board), num, board)
                     Tower.add_tower_r(tower)
+                    added = True
+
+                if added:
+                    buildings = get_buildings_adjacent_to_tower(Board.get_towers(board), num, board)
+                    new_buildings = []
+                    for b in buildings:
+                        if b not in before_adj:
+                            new_buildings.append(b)
+                    if len(new_buildings) > 0:
+                        #we have a new owner
+                        new_building = new_buildings[0]
+                        if Building.has_owner(new_building):
+                            new_owner = Building.get_owner(new_building)
+                            tile = get_tile_from_supply(tile_supply, Tile.TOWER_TILE, num)
+                            if tile == None:
+                                tile = get_tile_from_all(players, Tile.TOWER_TILE, num)
+                            if new_owner == Building.NEUTRAL_OWNER:
+                                tile_supply.append(tile)
+                            else:
+                                new_owner = get_player_with_name(players, new_owner)
+                                Player.give_tile(new_owner, tile)
+
     return board, players, tile_supply
 
 def get_agent_moves(agent, board, current, tile_supply, players, num_moves=2):
