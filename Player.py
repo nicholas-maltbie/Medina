@@ -76,7 +76,7 @@ def get_held_buildings(player):
     """Gets the buildings held by a player"""
     return player['buildings']
 
-def remvoe_all_buildings_of_color(player, color):
+def remove_all_buildings_of_color(player, color):
     """Removes all the buildings that a player has of a color"""
     get_held_buildings(player)[color] = 0
 

@@ -66,7 +66,7 @@ def get_rows(board):
     return board['Rows']
 
 def get_columns(board):
-    """Gets the number of columsn in a board."""
+    """Gets the number of columns in a board."""
     return board['Columns']
 
 def get_buildings(board):
@@ -91,6 +91,10 @@ def get_all_locations(board):
     columns = get_columns(board)
     return [make_location(i // rows, i % columns) for i in range(rows * columns)]
 
+def get_buildings_claimed_by(board, player_name):
+    """Gets all the buildings claimed by a player with the given name."""
+    return [building for building in get_buildings(board) if get_owner(building) == player_name]
+    
 def get_bounded_set(board, location_set):
     """Gets a set of all locations in location_set that are within the bounds
     of the board. Locations are considered within the bounds if the row
@@ -278,7 +282,9 @@ def get_num_walls_adjacent_to_building(board, building):
 
 def get_num_merchants_adjacent_to_building(board, building):
     """Gets the number of merchants orthogonally adjacent to a given buidling."""
-    merchant_locations = get_wall_locations(get_towers(board))
+    merchant_locations = []
+    for street in get_market(board):
+        merchant_locations += street
     count = 0
     orthogonal = get_building_stable_othogonal(building)
     for merchant in merchant_locations:
