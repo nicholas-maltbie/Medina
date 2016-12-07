@@ -6,16 +6,50 @@ import Board
 import BoardCanvas
 import Player
 import Tile
+import Location
 import GameConstants
 import threading
 
-def make_human_agent(board_canvas, player):
-    """Makes a human agent based off a player who plays on the given board"""
-    grid = BoardCanvas.GRID_SIZE
-    gap = BoardCanvas.GRID_GAP
-    drawn = {}
+class HumanAgent:
 
-    def draw_human_items(player):
+    def __init__(self, board_canvas, player):
+        """Makes a human agent based off a player who plays on the given board"""
+        self.grid = BoardCanvas.GRID_SIZE
+        self.gap = BoardCanvas.GRID_GAP
+        self.draw_human_items(player)
+        self.board_canvas = board_canvas
+        board_canvas.add_board_action_listener(self)
+
+
+    def on_click(self, event, image_id, piece, data=None):
+        """To satify being a board action listener"""
+        self.pos = (event.x, event.y)
+
+    def on_drop(self, event, image_id, piece, data=None):
+        """To satify being a board action listener"""
+        valid = True
+
+        if valid:
+            x, y = event.x, event.y
+            x -= self.board_canvas.offx
+            y -= self.board_canvas.offy
+            row = round((y - (self.grid) / 2) / (self.grid + self.gap))
+            col = round((x - (self.grid + self.gap) / 2) / (self.grid + self.gap))
+            loc = Location.make_location(row, col)
+            coords = self.board_canvas.get_board_pixels(loc)
+            self.board_canvas.can.move(image_id,
+                    coords[0] - self.board_canvas.can.coords(image_id)[0],
+                    coords[1] - self.board_canvas.can.coords(image_id)[1])
+        else:
+            self.board_canvas.can.move(image_id, self.pos[0] - event.x, self.pos[1] - event.y)
+
+    def on_move(self, event, image_id, piece, data=None):
+        """To satify being a board action listener"""
+        pass
+
+    def draw_human_items(self, player):
+        grid = self.grid
+        gap = self.gap
         offy = gap * 3 + grid * 5 / 2
         """Draws a player's items on the screen"""
         def draw_things(offy, draw_method, num_things, piece_type, x_jump = grid + gap):
@@ -23,7 +57,7 @@ def make_human_agent(board_canvas, player):
             if num_things > 0:
                 offx = board_canvas.get_board_width() + gap + grid // 2
                 for i in range(num_things):
-                    drawn[(piece_type, i)] = draw_method(offx, offy)
+                    draw_method(offx, offy)
                     offx += x_jump
                     if (i + 1) % 6 == 0 and i != num_things - 1:
                         offx = board_canvas.get_board_width() + gap + grid // 2
@@ -46,11 +80,8 @@ def make_human_agent(board_canvas, player):
         offy = draw_things(offy, lambda x, y: board_canvas.add_moveable_wall((x, y)),
                 Player.get_held_walls(player), Move.WALL, x_jump = grid + gap * 2)
 
-    def human_decision(board, player_index, num_moves, players):
+    def human_decision(self, board, player_index, num_moves, players):
         pass
-
-    draw_human_items(player)
-    return human_decision
 
 if __name__ == "__main__":
     board = Board.make_board(11, 16)
@@ -66,7 +97,8 @@ if __name__ == "__main__":
     board_canvas.setup()
 
     def test_game():
-        human_agent = make_human_agent(board_canvas, player)
+        human_agent = HumanAgent(board_canvas, player)
+
 
     thread = threading.Thread(target = test_game)
     thread.start()
