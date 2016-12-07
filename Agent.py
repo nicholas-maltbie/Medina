@@ -67,10 +67,10 @@ def get_all_possible_moves(player, board):
 
     return possible
 
-def can_make_move(move, board, player):
+def can_make_move(board, player):
     """Checks if a player can make a move"""
     for color in GameConstants.BUILDINGS_COLORS:
-        for loc in Board.get_building_piece_locations(board, color):
+        if len(Board.get_building_piece_locations(board, color)):
             if(Player.get_held_buildings_of_color(player, color) > 0):
                 return True
         building = Board.get_active_building(board, color)
@@ -80,23 +80,18 @@ def can_make_move(move, board, player):
                 has_claimed = True
         if not has_claimed and Board.get_active_building(board, color) != None and \
                 not Building.has_owner(Board.get_active_building(board, color)):
-            for loc in Building.get_building_locations(building):
-                return True
-    for loc in Board.get_stable_piece_location(board):
+            return True
+    if len(Board.get_stable_piece_location(board)):
         if(Player.get_num_stables(player) > 0):
             return True
-    for loc in Board.get_merchant_place_locations(board):
+    if len(Board.get_merchant_place_locations(board)):
         if(Player.get_held_merchants(player) > 0):
             return True
-    for loc in Tower.get_possible_wall_additions(Board.get_towers(board)):
+    if len(Tower.get_possible_wall_additions(Board.get_towers(board))):
         if(Player.get_held_walls(player) > 0):
             return True
 
-    has_tea = False
-    for tile in Player.get_tiles(player):
-        if Tile.get_tile_type(tile) == Tile.TEA_TILE:
-            has_tea = True
-    if has_tea:
+    if len(Player.get_tiles_of_type(player, Tile.TEA_TILE)):
         return True
     return False
 
