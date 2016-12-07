@@ -78,8 +78,7 @@ def can_make_move(board, player):
         for building in Board.get_buildings_by_color(board, color):
             if Building.get_owner(building) == Player.get_player_name(player):
                 has_claimed = True
-        if not has_claimed and Board.get_active_building(board, color) != None and \
-                not Building.has_owner(Board.get_active_building(board, color)):
+        if not has_claimed and building != None:
             return True
     if len(Board.get_stable_piece_location(board)):
         if(Player.get_num_stables(player) > 0):

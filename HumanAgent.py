@@ -41,7 +41,7 @@ class HumanAgent:
         x, y = event.x, event.y
         x -= self.board_canvas.offx
         y -= self.board_canvas.offy
-        row = round((y - (self.grid) / 2) / (self.grid + self.gap))
+        row = round((y - (self.grid + self.gap) / 2) / (self.grid + self.gap))
         col = round((x - (self.grid + self.gap) / 2) / (self.grid + self.gap))
         loc = Location.make_location(row, col)
         if piece == Move.ROOFTOP:
@@ -92,6 +92,7 @@ class HumanAgent:
                             coords = self.board_canvas.can.coords(self.drawn_things[key])
                             if coords != (int(offx), int(offy)):
                                 self.board_canvas.can.move(self.drawn_things[key], offx - coords[0], offy - coords[1])
+                            self.board_canvas.can.tag_raise(self.drawn_things[key])
                     else:
                         self.drawn_things[key] = draw_method(offx, offy, val)
                     offx += x_jump
@@ -156,11 +157,11 @@ class HumanAgent:
         self.draw_human_items(self.player)
         self.is_turn = True
         while len(moves) < num_moves:
-            print("getting next human move")
-            if not Agent.can_make_move(board, players[player_index]):
-                print("no possible moves found")
-                moves.append(Move.make_move(Player.get_player_name(players[player_index]), Move.NONE_POSSIBLE))
-            print("waiting for player input")
+            #print("getting next human move")
+            if not Agent.can_make_move(self.board, self.players[self.player_index]):
+                #print("no possible moves found")
+                moves.append(Move.make_move(Player.get_player_name(self.players[self.player_index]), Move.NONE_POSSIBLE))
+            #print("waiting for player input")
             image_id, move = self.actions_queue.get()
             moves.append(move)
             self.board_canvas.remove_moveable_item(image_id)
