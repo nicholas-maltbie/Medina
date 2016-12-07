@@ -41,12 +41,12 @@ class HumanAgent:
         loc = Location.make_location(row, col)
         if piece == Move.ROOFTOP:
             for color in GameConstants.BUILDINGS_COLORS:
-                building = Board.get_active_building(board, color)
+                building = Board.get_active_building(self.board, color)
                 if building != None and loc in Building.get_building_locations(building):
                     data = color
 
-        move = Move.make_move(Player.get_player_name(player), Move.NORMAL, piece, loc, data)
-        valid = Agent.is_valid_move(move, self.board, player)
+        move = Move.make_move(Player.get_player_name(self.player), Move.NORMAL, piece, loc, data)
+        valid = Agent.is_valid_move(move, self.board, self.player)
 
         if valid:
             self.board_canvas.remove_moveable_item(image_id)
