@@ -186,9 +186,10 @@ class HumanAgent:
             if not Agent.can_make_move(self.board, self.players[self.player_index]):
                 #print("no possible moves found")
                 if self.raise_dialog:
-                    tkinter.messageboxs.showwarning(Player.get_player_name("No Actions",
+                    tkinter.messagebox.showinfo(Player.get_player_name("No Actions",
                             "You cannot take any more actions this turn"))
-                moves.append(Move.make_move(Player.get_player_name(self.players[self.player_index]), Move.NONE_POSSIBLE))
+                while len(moves) < num_moves:
+                    moves.append(Move.make_move(Player.get_player_name(self.players[self.player_index]), Move.NONE_POSSIBLE))
             #print("waiting for player input")
             image_id, move = self.actions_queue.get()
             moves.append(move)
@@ -224,7 +225,7 @@ if __name__ == "__main__":
         players = [Player.make_player(names[i], 4, colors[i]) for i in range(4)]
         random_agent = Agent.get_random_agent()
         human_agent = HumanAgent(board_canvas, board, tile_supply, 0, players)
-        agents = [human_agent.human_decision] * 2 + [random_agent] * 2
+        agents = [human_agent.human_decision] * 4
         scores, board, players, tile_supply = Game.play_game(board_canvas, board,
             players, tile_supply, agents)
         human_agent.human_decision(board, 0, players, tile_supply, 0)
