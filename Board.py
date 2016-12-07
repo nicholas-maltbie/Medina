@@ -66,7 +66,7 @@ def get_rows(board):
     return board['Rows']
 
 def get_columns(board):
-    """Gets the number of columsn in a board."""
+    """Gets the number of columns in a board."""
     return board['Columns']
 
 def get_buildings(board):

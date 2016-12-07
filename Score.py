@@ -6,5 +6,19 @@ from Player import *
 from Tile import *
 from Building import *
 
-def get_score(board, player)
+for color in BUILDINGS_COLORS:
+        print(color)
+        
+        
+
+def get_score(board, player):
+    for color in BUILDINGS_COLORS:
+        print(color)
+        
+        return 0
+        
+    """Score from buildings"""
+    """Stables, Well points, Walls, Merchants"""
     
+    """Score from tiles"""
+    """Palace Tiles, Tower Tiles"""
