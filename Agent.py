@@ -67,6 +67,75 @@ def get_all_possible_moves(player, board):
 
     return possible
 
+def can_make_move(move, board, player):
+    """Checks if a player can make a move"""
+    for color in GameConstants.BUILDINGS_COLORS:
+        for loc in Board.get_building_piece_locations(board, color):
+            if(Player.get_held_buildings_of_color(player, color) > 0):
+                return True
+        building = Board.get_active_building(board, color)
+        has_claimed = False
+        for building in Board.get_buildings_by_color(board, color):
+            if Building.get_owner(building) == Player.get_player_name(player):
+                has_claimed = True
+        if not has_claimed and Board.get_active_building(board, color) != None and \
+                not Building.has_owner(Board.get_active_building(board, color)):
+            for loc in Building.get_building_locations(building):
+                return True
+    for loc in Board.get_stable_piece_location(board):
+        if(Player.get_num_stables(player) > 0):
+            return True
+    for loc in Board.get_merchant_place_locations(board):
+        if(Player.get_held_merchants(player) > 0):
+            return True
+    for loc in Tower.get_possible_wall_additions(Board.get_towers(board)):
+        if(Player.get_held_walls(player) > 0):
+            return True
+
+    has_tea = False
+    for tile in Player.get_tiles(player):
+        if Tile.get_tile_type(tile) == Tile.TEA_TILE:
+            has_tea = True
+    if has_tea:
+        return True
+    return False
+
+def is_valid_move(move, board, player):
+    """Checks if a move is valid for a given player"""
+    move_type = Move.get_move_type(move)
+    if move_type == Move.NONE_POSSIBLE:
+        return not can_make_move(board, player)
+    if move_type == Move.PASS:
+        return Player.get_tiles_of_type(player, Tile.TEA_TILE) > 0
+    else:
+        piece = Move.get_piece(move)
+        move_loc = Move.get_location(move)
+        if piece == Move.BUILDING:
+            move_color = Move.get_move_color(move)
+            return Player.get_held_buildings_of_color(player, move_color) <= 0 and
+                    move_loc in Board.get_building_piece_locations(board) and
+                    move_loc in Building.get_building_piece_attach(Board.get_active_building(board, move_color))
+        elif piece == Move.STABLE:
+            return Player.get_num_stables(player) > 0 and
+                    move_loc in Board.get_stable_piece_location(board)
+        elif piece == Move.MERCHANT:
+            return Player.get_held_merchants(player) > 0 and
+                    move_loc in Board.get_merchant_place_locations(board)
+        elif piece == Move.ROOFTOP:
+            if Plyaer.get_held_rooftops(player) <= 0:
+                return Falses
+            move_color = Move.get_move_color(move)
+            claimed_building = Board.get_active_building(board, color)
+            if move_loc not in Building.get_building_locations(claimed_building):
+                return False
+            for building in Board.get_buildings_by_color(board, move_color):
+                if Building.get_owner(building) == Player.get_player_name(player):
+                    return False
+            return True
+        elif piece == Move.WALL:
+            return Player.get_held_walls(player) > 0 and move_loc in Tower.get_possible_wall_additions
+        return False
+
 def apply_move(move, board, tile_supply, player_index, players):
     """Applys a given move to a board and returns a new board with the move
     applyed to it. The original board remains unchanged."""
