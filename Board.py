@@ -274,7 +274,7 @@ def get_num_walls_adjacent_to_building(board, building):
     """Gets the number of walls orthogonally adjacent to a given building."""
     wall_locations = get_wall_locations(get_towers(board))
     count = 0
-    orthogonal = get_building_stable_othogonal(building)
+    orthogonal = get_building_stable_orthogonal(building)
     for wall in wall_locations:
         if wall in orthogonal:
             count += 1
@@ -286,7 +286,7 @@ def get_num_merchants_adjacent_to_building(board, building):
     for street in get_market(board):
         merchant_locations += street
     count = 0
-    orthogonal = get_building_stable_othogonal(building)
+    orthogonal = get_building_stable_orthogonal(building)
     for merchant in merchant_locations:
         if merchant in orthogonal:
             count += 1

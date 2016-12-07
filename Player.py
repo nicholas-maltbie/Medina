@@ -164,7 +164,7 @@ def lose_tile(player, tile_type, value):
 
 def give_tile(player, tile):
     """Gives a player a tile of tile_type and the player will gain the
-    merchatns on the tile if the tile is a TOWER_TILE with merchants left."""
+    merchants on the tile if the tile is a TOWER_TILE with merchants left."""
     if get_tile_type(tile) == TOWER_TILE:
         give_merchants(player, take_merchants(tile))
     get_tiles(player).append(tile)
