@@ -46,7 +46,7 @@ def get_double_orthogonal(location):
     row = get_row(location)
     column = get_column(location)
     return [make_location(row - 2, column), make_location(row, column + 2), 
-    make_location(row + 2, column), make_location(row, column - 2)]
+        make_location(row + 2, column), make_location(row, column - 2)]
     
 def get_orthogonal_within_bounds(location, max_row, max_column, min_row = 0, min_column = 0):
     """Gets the orthogonally adjacent locations filtering out those that are not

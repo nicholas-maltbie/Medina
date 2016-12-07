@@ -58,7 +58,7 @@ def get_wall_locations(towers):
     of rows and the number of columns."""
     walls = []
     for num in range(4):
-        walls.append(get_wall_locations_for_tower(towers, num + 1))
+        walls.extend(get_wall_locations_for_tower(towers, num))
     return walls
 
 def get_structures(towers):

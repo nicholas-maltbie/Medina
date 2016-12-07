@@ -82,7 +82,7 @@ def get_building_orthogonal(building):
 
 def get_building_stable_orthogonal(building):
     """Gets a set of all locations orthogonally adjacent to the building and
-    attached stables. This exclues the locations of stables."""
+    attached stables. This excludes the locations of stables."""
     included = get_building_locations(building)[:]
     included.extend(get_stable_locations(building))
     building_orth = set()

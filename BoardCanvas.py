@@ -450,13 +450,6 @@ class BoardCanvas(tkinter.Tk):
                 rooftops.append(Building.get_rooftop_location(building))
                 rooftop_colors[Building.get_rooftop_location(building)] = Building.get_owner_color(building)[0]
 
-        for key in list(self.drawn_edges.keys()):
-            if key not in edges:
-                self.can.delete(self.drawn_edges[key])
-                del self.drawn_edges[key]
-        for edge in edges:
-            if edge not in self.drawn_edges:
-                self.drawn_edges[edge] = self.draw_edge(edge, PLAYER_COLORS_HEX[edge_colors[edge]])
 
         for key in list(self.drawn_rooftops.keys()):
             if key not in rooftops:
@@ -487,6 +480,17 @@ class BoardCanvas(tkinter.Tk):
                 current = self.check_placed_wall(side_text, index)
                 if current == None:
                     self.add_wall_to_grid(side_text, index)
+                
+        for key in list(self.drawn_edges.keys()):
+            if key not in edges:
+                self.can.delete(self.drawn_edges[key])
+                del self.drawn_edges[key]
+            else:
+                self.can.tag_raise(self.drawn_edges[key])
+        for edge in edges:
+            if edge not in self.drawn_edges:
+                self.drawn_edges[edge] = self.draw_edge(edge, PLAYER_COLORS_HEX[edge_colors[edge]])
+                
         if self.drag_data["item"] != None:
             self.can.tag_raise(self.drag_data["item"])
 
