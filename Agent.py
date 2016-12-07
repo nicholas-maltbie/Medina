@@ -113,6 +113,9 @@ def is_valid_move(move, board, player):
         move_loc = Move.get_location(move)
         if piece == Move.BUILDING:
             move_color = Move.get_move_color(move)
+            locs = list(Board.get_building_piece_locations(board, move_color))
+            locs.sort()
+            print(locs)
             return Player.get_held_buildings_of_color(player, move_color) > 0 and \
                     move_loc in Board.get_building_piece_locations(board, move_color)
         elif piece == Move.STABLE:

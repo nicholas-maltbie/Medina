@@ -53,6 +53,7 @@ class HumanAgent:
             self.board, self.players, self.tile_supply = Agent.apply_move(move,
                     self.board, self.tile_supply, self.player_index, self.players)
             self.board_canvas.board = self.board
+            self.board_canvas.tile_supply = self.tile_supply
             self.board_canvas.player = self.players[self.player_index]
             self.player = self.players[self.player_index]
             self.board_canvas.update_board()

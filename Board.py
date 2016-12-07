@@ -89,20 +89,21 @@ def get_all_locations(board):
     """Gets a set of all locations in a board."""
     rows = get_rows(board)
     columns = get_columns(board)
-    return [make_location(i // rows, i % columns) for i in range(rows * columns)]
+    return [make_location(i // columns, i % columns) for i in range(rows * columns)]
 
 def get_buildings_claimed_by(board, player_name):
     """Gets all the buildings claimed by a player with the given name."""
     return [building for building in get_buildings(board) if get_owner(building) == player_name]
-    
+
 def get_bounded_set(board, location_set):
     """Gets a set of all locations in location_set that are within the bounds
     of the board. Locations are considered within the bounds if the row
     of the location is >= 0 and < row and if the column is >= 0 and < columns."""
     bounded = set()
-    for location in location_set:
-        if is_within_bounds(location, get_rows(board), get_columns(board)):
-            bounded.add(location)
+    for loc in location_set:
+        if get_row(loc) < get_rows(board) and get_row(loc) >= 0 and \
+                get_column(loc) < get_columns(board) and get_column(loc) >= 0:
+            bounded.add(loc)
     return bounded
 
 def get_stable_piece_location(board):
