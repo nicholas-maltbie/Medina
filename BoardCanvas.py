@@ -480,7 +480,7 @@ class BoardCanvas(tkinter.Tk):
                 current = self.check_placed_wall(side_text, index)
                 if current == None:
                     self.add_wall_to_grid(side_text, index)
-                
+
         for key in list(self.drawn_edges.keys()):
             if key not in edges:
                 self.can.delete(self.drawn_edges[key])
@@ -490,7 +490,7 @@ class BoardCanvas(tkinter.Tk):
         for edge in edges:
             if edge not in self.drawn_edges:
                 self.drawn_edges[edge] = self.draw_edge(edge, PLAYER_COLORS_HEX[edge_colors[edge]])
-                
+
         if self.drag_data["item"] != None:
             self.can.tag_raise(self.drag_data["item"])
 
@@ -667,6 +667,12 @@ class BoardCanvas(tkinter.Tk):
                 y2 += WALL_WIDTH
             self.can.create_line(x1 - (GRID_SIZE + GRID_GAP) // 2,y1 - (GRID_SIZE + GRID_GAP) // 2, \
                     x2 - (GRID_SIZE + GRID_GAP) // 2,y2 - (GRID_SIZE + GRID_GAP) // 2)
+
+    def add_moveable_image(self, image, coords, item_type, data=None):
+        """Adds a moveable image to the screen"""
+        image_id = self.can.create_image(coords, image = image, tags = "token")
+        self.moveable_items[image_id] = (item_type, data)
+        return image_id
 
     def add_moveable_building(self, color, coords):
         """Adds a moveable building of a specified color at an x and y"""

@@ -106,7 +106,7 @@ def is_valid_move(move, board, player):
     if move_type == Move.NONE_POSSIBLE:
         return not can_make_move(board, player)
     if move_type == Move.PASS:
-        return Player.get_tiles_of_type(player, Tile.TEA_TILE) > 0
+        return len(Player.get_tiles_of_type(player, Tile.TEA_TILE)) > 0
     else:
         piece = Move.get_piece(move)
         move_loc = Move.get_location(move)
