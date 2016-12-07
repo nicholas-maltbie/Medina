@@ -197,7 +197,7 @@ def apply_move(move, board, tile_supply, player_index, players):
                     is_largest = False
             if len(claimed) == len(players):
                 for player in players:
-                    Player.remvoe_all_buildings_of_color(player, color)
+                    Player.remove_all_buildings_of_color(player, color)
             if is_largest:
                 from_supply = get_tile_from_supply(tile_supply, Tile.PALACE_TILE, Tile.PALACE_VALUES[color])
                 if from_supply != None:
