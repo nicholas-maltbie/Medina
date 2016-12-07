@@ -53,7 +53,7 @@ def clone_player(player):
     return {'name':get_player_name(player),'buildings':get_held_buildings(player).copy(),
             'stables':get_num_stables(player), 'rooftops':get_held_rooftops(player),
             'merchants':get_held_merchants(player),'walls': get_held_walls(player),
-            'color':get_player_color(player),
+            'color':get_player_color(player), 'extra':get_extra_rooftops(player),
             'tiles':[clone_tile(tile) for tile in get_tiles(player)]}
 
 def get_num_stables(player):

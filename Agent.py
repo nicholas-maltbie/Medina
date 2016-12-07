@@ -102,7 +102,6 @@ def can_make_move(move, board, player):
 
 def is_valid_move(move, board, player):
     """Checks if a move is valid for a given player"""
-    print(move)
     move_type = Move.get_move_type(move)
     if move_type == Move.NONE_POSSIBLE:
         return not can_make_move(board, player)
@@ -115,7 +114,6 @@ def is_valid_move(move, board, player):
             move_color = Move.get_move_color(move)
             locs = list(Board.get_building_piece_locations(board, move_color))
             locs.sort()
-            print(locs)
             return Player.get_held_buildings_of_color(player, move_color) > 0 and \
                     move_loc in Board.get_building_piece_locations(board, move_color)
         elif piece == Move.STABLE:
