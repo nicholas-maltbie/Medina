@@ -102,6 +102,7 @@ def can_make_move(move, board, player):
 
 def is_valid_move(move, board, player):
     """Checks if a move is valid for a given player"""
+    print(move)
     move_type = Move.get_move_type(move)
     if move_type == Move.NONE_POSSIBLE:
         return not can_make_move(board, player)
@@ -112,20 +113,21 @@ def is_valid_move(move, board, player):
         move_loc = Move.get_location(move)
         if piece == Move.BUILDING:
             move_color = Move.get_move_color(move)
-            return Player.get_held_buildings_of_color(player, move_color) <= 0 and
-                    move_loc in Board.get_building_piece_locations(board) and
-                    move_loc in Building.get_building_piece_attach(Board.get_active_building(board, move_color))
+            return Player.get_held_buildings_of_color(player, move_color) > 0 and \
+                    move_loc in Board.get_building_piece_locations(board, move_color)
         elif piece == Move.STABLE:
-            return Player.get_num_stables(player) > 0 and
+            return Player.get_num_stables(player) > 0 and \
                     move_loc in Board.get_stable_piece_location(board)
         elif piece == Move.MERCHANT:
-            return Player.get_held_merchants(player) > 0 and
+            return Player.get_held_merchants(player) > 0 and \
                     move_loc in Board.get_merchant_place_locations(board)
         elif piece == Move.ROOFTOP:
-            if Plyaer.get_held_rooftops(player) <= 0:
-                return Falses
+            if Player.get_held_rooftops(player) <= 0:
+                return False
             move_color = Move.get_move_color(move)
-            claimed_building = Board.get_active_building(board, color)
+            claimed_building = Board.get_active_building(board, move_color)
+            if claimed_building == None:
+                return False
             if move_loc not in Building.get_building_locations(claimed_building):
                 return False
             for building in Board.get_buildings_by_color(board, move_color):
@@ -133,7 +135,7 @@ def is_valid_move(move, board, player):
                     return False
             return True
         elif piece == Move.WALL:
-            return Player.get_held_walls(player) > 0 and move_loc in Tower.get_possible_wall_additions
+            return Player.get_held_walls(player) > 0 and move_loc in Tower.get_possible_wall_additions(Board.get_towers(board))
         return False
 
 def apply_move(move, board, tile_supply, player_index, players):
