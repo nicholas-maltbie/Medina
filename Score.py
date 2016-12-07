@@ -6,6 +6,7 @@ from Board import *
 from Player import *
 from Tile import *
 from Building import *
+import tkinter
 
 
 def get_score_function(board):
@@ -36,6 +37,42 @@ def get_score_function(board):
         return score
     
     return get_score
+    
+def displayScore():
+    root = tkinter.Tk()
+    root.title("Final Scores")
+    root.geometry("300x300")
+    root.configure(background = "#0781ba")
+
+    app = tkinter.Frame(root)
+    app.grid()
+    app.configure(background = "#0781ba")
+
+    def secondWindow(name):
+        root2 = tkinter.Tk()
+        root2.title("Scores of " + name)
+        root2.geometry("300x300")
+        root2.configure(background = "#0781ba")
+        
+        app2 = tkinter.Frame(root2)
+        app2.grid()
+        app2.configure(background = "#0781ba")
+        
+        buttonExit = tkinter.Button(app2, text = " Exit " , command=exit)
+        buttonExit.grid(row=2, sticky="W", padx = XPAD, pady = YPAD)
+        root2.mainloop()
+        
+    name1 = "Nick and all of his friends"
+    XPAD = 10
+    YPAD = 5
+
+    button1 = tkinter.Button(app, text = " Reveal Scores of " + name1, background = "#ccaa00", command=lambda: secondWindow(name1))
+    button1.grid(row=1, sticky="W", padx = XPAD, pady = YPAD)
+
+    buttonExit = tkinter.Button(app, text = " Exit " , command=exit)
+    buttonExit.grid(row=2, sticky="W", padx = XPAD, pady = YPAD)
+
+    root.mainloop()
 
 if __name__ == "__main__": #test function only executed if Score.py is main
     board = make_board(11, 16)
