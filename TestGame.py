@@ -21,7 +21,7 @@ if __name__ == "__main__":
         import time
         #time.sleep(1)
         colors = ['Blue', 'Green', 'Yellow', 'Red']
-        names = ['Nick', 'Zach', 'Brian', 'Aaron']
+        names = ['Nick', 'Zach', 'Brian', 'Erin']
         players = [Player.make_player(names[i], 4, colors[i]) for i in range(4)]
         random_agent = Agent.get_random_agent()
         agents = [random_agent for _ in range(4)]
@@ -81,11 +81,14 @@ if __name__ == "__main__":
             if no_moves == len(players) or game_over(board, players):
                 board_canvas.update_board()
                 
+                #Score############################
                 get_score = Score.get_score_function(board)
                 for i in range(len(players)):
                     score = get_score(players[i])
                     print (Player.get_player_color(players[i]), score)
                     print (Player.get_tiles(players[i]))
+                Score.displayScores(players, board)
+                
                 input()
                 
                 #time.sleep(3)

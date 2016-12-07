@@ -13,7 +13,7 @@ from Move import *
 from GameConstants import *
 
 """Size for the wall locations"""
-WALL_WIDTH = 30
+WALL_WIDTH = 20
 """Size of each grid square in pixels"""
 GRID_SIZE = 34
 """Size of the gap between grid locations"""
@@ -76,14 +76,14 @@ class BoardCanvas(tkinter.Tk):
                 img = tkinter.PhotoImage(file="Assets/Building_" + color[0] + ".gif")
                 BUILDING_IMAGES[color] = img.subsample(img.width() // GRID_SIZE, img.height() // GRID_SIZE)
             img = tkinter.PhotoImage(file="Assets/Wall_North.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (GRID_SIZE + GRID_GAP)))
+            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (WALL_WIDTH)))
             img = tkinter.PhotoImage(file="Assets/Wall_South.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (GRID_SIZE + GRID_GAP)))
+            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (WALL_WIDTH)))
 
             img = tkinter.PhotoImage(file="Assets/Wall_East.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP), img.height() // (GRID_SIZE + GRID_GAP + 1)))
+            WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 1)))
             img = tkinter.PhotoImage(file="Assets/Wall_West.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP), img.height() // (GRID_SIZE + GRID_GAP + 1)))
+            WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 1)))
 
         rows = Board.get_rows(self.board)
         columns = Board.get_columns(self.board)
@@ -282,16 +282,16 @@ class BoardCanvas(tkinter.Tk):
         or leftmost wall."""
         if wall == 'N':
             x, y = self.get_board_pixels(Location.make_location(-1, index));
-            return x, y
+            return x, y + (GRID_GAP+GRID_SIZE)/2 - WALL_WIDTH/2
         if wall == 'E':
             x, y = self.get_board_pixels(Location.make_location(index, self.columns));
-            return x, y
+            return x - (GRID_GAP+GRID_SIZE)/2 + WALL_WIDTH/2, y
         if wall == 'S':
             x, y = self.get_board_pixels(Location.make_location(self.rows, index));
-            return x, y
+            return x, y-(GRID_GAP+GRID_SIZE)/2 + WALL_WIDTH/2
         if wall == 'W':
             x, y = self.get_board_pixels(Location.make_location(index, -1));
-            return x, y
+            return x + (GRID_GAP+GRID_SIZE)/2 - WALL_WIDTH/2, y
 
     def get_tower_pixels(self, tower_number):
         """Gets the center of a tower given the tower number"""

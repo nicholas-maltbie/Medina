@@ -31,26 +31,43 @@ def get_score_function(board):
                 score += 1 #add one because its part of a building (counts stables)
                 if loc in bonusLocations:
                     score += 4
-            score += get_num_walls_adjacent_to_building(board, building)
-            score += get_num_merchants_adjacent_to_building(board, building)
+            score += get_num_walls_adjacent_to_building(board, building) #walls
+            score += get_num_merchants_adjacent_to_building(board, building) #merchants
             
         return score
     
     return get_score
     
-def displayScore():
-    root = tkinter.Tk()
+def displayScores(players, board): #funtion that is called to display scores
+    
+    name = [None] * len(players) #name is a list that will hold player names
+    for i in range(len(players)):
+        name[i] = get_player_name(players[i])
+    
+    XPAD = 10 #x and y padding for the buttons
+    YPAD = 5
+    BUTTON_COLOR = "#07ba37"
+    EXIT_COLOR = "white"
+    BACK_COLOR = "white"
+    
+    root = tkinter.Tk() #root is the whole window
     root.title("Final Scores")
-    root.geometry("300x300")
+    root.geometry("300x200")
     root.configure(background = "#0781ba")
 
-    app = tkinter.Frame(root)
+    app = tkinter.Frame(root) #app is the space the buttons go
     app.grid()
     app.configure(background = "#0781ba")
+    
+    
 
-    def secondWindow(name):
+    def secondWindow(player): #second window opened to display specific scores
+    
+        def close_window(): #this function when called closes the extra window
+            root2.destroy()
+        
         root2 = tkinter.Tk()
-        root2.title("Scores of " + name)
+        root2.title("Scores of " + get_player_name(player))
         root2.geometry("300x300")
         root2.configure(background = "#0781ba")
         
@@ -58,19 +75,30 @@ def displayScore():
         app2.grid()
         app2.configure(background = "#0781ba")
         
-        buttonExit = tkinter.Button(app2, text = " Exit " , command=exit)
-        buttonExit.grid(row=2, sticky="W", padx = XPAD, pady = YPAD)
-        root2.mainloop()
+        get_score = get_score_function(board)
+        score = get_score(player)
+        label1 = tkinter.Label(app2, text = str(score))
+        label1.grid(row=1, sticky="W", padx = XPAD, pady = YPAD)
         
-    name1 = "Nick and all of his friends"
-    XPAD = 10
-    YPAD = 5
+        buttonBack = tkinter.Button(app2, text = " Back to All Scores ", background = BACK_COLOR, command=close_window)
+        buttonBack.grid(row=10, sticky="W", padx = XPAD, pady = YPAD)
+        root2.mainloop()
 
-    button1 = tkinter.Button(app, text = " Reveal Scores of " + name1, background = "#ccaa00", command=lambda: secondWindow(name1))
-    button1.grid(row=1, sticky="W", padx = XPAD, pady = YPAD)
+    #These are the buttons on the main window that when clicked reveal each persons score
+    button0 = tkinter.Button(app, text = " Reveal Scores of " + name[0], background = BUTTON_COLOR, command=lambda: secondWindow(players[0]))
+    button0.grid(row=1, sticky="W", padx = XPAD, pady = YPAD)
+    
+    button1 = tkinter.Button(app, text = " Reveal Scores of " + name[1], background = BUTTON_COLOR, command=lambda: secondWindow(players[1]))
+    button1.grid(row=2, sticky="W", padx = XPAD, pady = YPAD)
+    
+    button2 = tkinter.Button(app, text = " Reveal Scores of " + name[2], background = BUTTON_COLOR, command=lambda: secondWindow(players[2]))
+    button2.grid(row=3, sticky="W", padx = XPAD, pady = YPAD)
+    
+    button3 = tkinter.Button(app, text = " Reveal Scores of " + name[3], background = BUTTON_COLOR, command=lambda: secondWindow(players[3]))
+    button3.grid(row=4, sticky="W", padx = XPAD, pady = YPAD)
 
-    buttonExit = tkinter.Button(app, text = " Exit " , command=exit)
-    buttonExit.grid(row=2, sticky="W", padx = XPAD, pady = YPAD)
+    buttonExit = tkinter.Button(app, text = " Exit ", background = EXIT_COLOR, command=exit)
+    buttonExit.grid(row=5, sticky="W", padx = XPAD, pady = YPAD)
 
     root.mainloop()
 
