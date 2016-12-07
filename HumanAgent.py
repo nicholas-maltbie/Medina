@@ -3,6 +3,7 @@ pieces so a human agent can play pieces on the board from his or her hand"""
 
 import Agent
 import Move
+import queue
 import Board
 import BoardCanvas
 import Player
@@ -25,8 +26,10 @@ class HumanAgent:
         self.player = players[player_index]
         self.players = players
         self.player_index = player_index
+        self.actions_queue = queue.Queue()
+        self.is_turn = False
 
-        self.draw_human_items(player)
+        self.draw_human_items(self.player)
         board_canvas.add_board_action_listener(self)
 
     def on_click(self, event, image_id, piece, data=None):
@@ -55,20 +58,8 @@ class HumanAgent:
 
         valid = Agent.is_valid_move(move, self.board, self.player)
 
-        if valid:
-            self.board_canvas.remove_moveable_item(image_id)
-            self.board, self.players, self.tile_supply = Agent.apply_move(move,
-                    self.board, self.tile_supply, self.player_index, self.players)
-            self.board_canvas.board = self.board
-            self.board_canvas.tile_supply = self.tile_supply
-            self.board_canvas.player = self.players[self.player_index]
-            self.player = self.players[self.player_index]
-            self.board_canvas.update_board()
-            self.draw_human_items(self.player)
-            #coords = self.board_canvas.get_board_pixels(loc)
-            #self.board_canvas.can.move(image_id,
-            #        coords[0] - self.board_canvas.can.coords(image_id)[0],
-            #        coords[1] - self.board_canvas.can.coords(image_id)[1])
+        if self.is_turn and valid:
+            self.actions_queue.put((image_id, move))
         else:
             coords = self.board_canvas.can.coords(image_id)
             self.board_canvas.can.move(image_id, self.pos[0] - event.x, self.pos[1] - event.y)
@@ -149,36 +140,70 @@ class HumanAgent:
                 self.board_canvas.tea_image, (x, y), Tile.TEA_TILE, n), \
                 values, Tile.TEA_TILE, x_jump = grid * 3 / 2 + gap, y_jump = grid * 2 + gap, push_x = grid / 2)
 
-    def human_decision(board, player_index, players, tile_supply, num_moves):
-        if not Agent.can_make_move(board, players[player_index]):
-            return Move.make_move(Player.get_player_name(players[player_index]), Move.NONE_POSSIBLE)
+    def human_decision(self, board, player_index, players, tile_supply, num_moves):
+        moves = []
+        self.board = board
+        self.players = players
+        self.tile_supply = tile_supply
+        self.player_index = player_index
+        self.player = players[player_index]
+
+        self.board_canvas.board = self.board
+        self.board_canvas.tile_supply = self.tile_supply
+        self.board_canvas.player = self.players[self.player_index]
+        self.player = self.players[self.player_index]
+        self.board_canvas.update_board()
+        self.draw_human_items(self.player)
+        self.is_turn = True
+        while len(moves) < num_moves:
+            print("getting next human move")
+            if not Agent.can_make_move(board, players[player_index]):
+                print("no possible moves found")
+                moves.append(Move.make_move(Player.get_player_name(players[player_index]), Move.NONE_POSSIBLE))
+            print("waiting for player input")
+            image_id, move = self.actions_queue.get()
+            moves.append(move)
+            self.board_canvas.remove_moveable_item(image_id)
+            self.board, self.players, self.tile_supply = Agent.apply_move(move,
+                    self.board, self.tile_supply, self.player_index, self.players)
+            self.board_canvas.board = self.board
+            self.board_canvas.tile_supply = self.tile_supply
+            self.board_canvas.player = self.players[self.player_index]
+            self.player = self.players[self.player_index]
+            self.board_canvas.update_board()
+            self.draw_human_items(self.player)
+        self.is_turn = False
+        return moves
 
 if __name__ == "__main__":
-
+    import Game
     colors = ['Blue', 'Green', 'Yellow', 'Red']
     names = ['Nick', 'Zach', 'Brian', 'Aaron']
     players = [Player.make_player(names[i], 4, colors[i]) for i in range(4)]
-
     board = Board.make_board(11, 16)
     tile_supply = Tile.get_all_tiles()
-    player = players[0]
-    player_index = 0
 
     grid = BoardCanvas.GRID_SIZE
     gap = BoardCanvas.GRID_GAP
-
-    board_canvas = None
-
+    board = Board.make_board(11, 16)
     board_canvas = BoardCanvas.BoardCanvas(board, tile_supply, additional_x= grid * 10)
     board_canvas.setup()
 
     def test_game():
-        human_agent = HumanAgent(board_canvas, board, tile_supply, player_index, players)
-
+        colors = ['Blue', 'Green', 'Yellow', 'Red']
+        names = ['Nick', 'Zach', 'Brian', 'Aaron']
+        players = [Player.make_player(names[i], 4, colors[i]) for i in range(4)]
+        random_agent = Agent.get_random_agent()
+        human_agent = HumanAgent(board_canvas, board, tile_supply, 0, players)
+        agents = [human_agent.human_decision] + [random_agent] * 3
+        scores = Game.play_game(board_canvas, board, players, tile_supply, agents)
+        scores_list = [(name, scores[name]) for name in scores]
+        scores_list.sort(key=lambda a: -a[1])
+        for i in range(len(scores_list)):
+            score = scores_list[i]
+            print(str(i + 1) + ")", score[0], score[1])
 
     thread = threading.Thread(target = test_game)
     thread.start()
 
     board_canvas.mainloop()
-    #print(Player.get_player_color(nick))
-    #print(nick)
