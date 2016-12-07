@@ -190,21 +190,19 @@ if __name__ == "__main__":
     board_canvas = BoardCanvas.BoardCanvas(board, tile_supply, additional_x= grid * 10)
     board_canvas.setup()
 
-    def test_game():
+    def test_game(board_canvas, board, tile_supply):
         colors = ['Blue', 'Green', 'Yellow', 'Red']
         names = ['Nick', 'Zach', 'Brian', 'Aaron']
         players = [Player.make_player(names[i], 4, colors[i]) for i in range(4)]
         random_agent = Agent.get_random_agent()
         human_agent = HumanAgent(board_canvas, board, tile_supply, 0, players)
         agents = [human_agent.human_decision] + [random_agent] * 3
-        scores = Game.play_game(board_canvas, board, players, tile_supply, agents)
-        scores_list = [(name, scores[name]) for name in scores]
-        scores_list.sort(key=lambda a: -a[1])
-        for i in range(len(scores_list)):
-            score = scores_list[i]
-            print(str(i + 1) + ")", score[0], score[1])
+        scores, board, players, tile_supply = Game.play_game(board_canvas, board,
+            players, tile_supply, agents)
+        human_agent.human_decision(board, 0, players, tile_supply, 0)
 
-    thread = threading.Thread(target = test_game)
+
+    thread = threading.Thread(target = test_game, args=[board_canvas, board, tile_supply])
     thread.start()
 
     board_canvas.mainloop()

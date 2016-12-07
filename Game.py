@@ -38,7 +38,8 @@ def turn_moves():
 def play_game(board_canvas, board, players, tile_supply, agents,
     start_player = -1):
     """This will play a game to completion based on a given setup and then
-    will return a dictionary of {playername:score for player in players}"""
+    will return a tuple that contains a dictionary of {playername:score for player in players},
+    the final board state, the final player states in a list, and the tile_supply."""
     current_player = random.randrange(len(players))
     if start_player >= 0:
         current_player = start_player
@@ -64,9 +65,10 @@ def play_game(board_canvas, board, players, tile_supply, agents,
 
         if no_moves == len(players) or game_over(board, players):
             board_canvas.update_board()
-
             get_score = Score.get_score_function(board)
-            return {Player.get_player_name(player):get_score(player) for player in players}
+            return {Player.get_player_name(player):get_score(player) for player in players}, \
+                    board, players, tile_supply
+
         current_player = (current_player + 1) % len(players)
 
 if __name__ == "__main__":
@@ -75,19 +77,15 @@ if __name__ == "__main__":
     board_canvas = BoardCanvas.BoardCanvas(board, tile_supply)
     board_canvas.setup()
 
-    def test_game():
+    def test_game(board_canvas, board, tile_supply):
         colors = ['Blue', 'Green', 'Yellow', 'Red']
         names = ['Nick', 'Zach', 'Brian', 'Aaron']
         players = [Player.make_player(names[i], 4, colors[i]) for i in range(4)]
         random_agent = Agent.get_random_agent()
         agents = [random_agent for _ in range(4)]
-        scores = play_game(board_canvas, board, players, tile_supply, agents)
-        scores_list = [(name, scores[name]) for name in scores]
-        scores_list.sort(key=lambda a: -a[1])
-        for i in range(len(scores_list)):
-            score = scores_list[i]
-            print(str(i + 1) + ")", score[0], score[1])
+        scores, board, players, tile_supply = play_game(board_canvas, board, players, tile_supply, agents)
+        Score.displaySimpleScore(scores)
 
-    thread = threading.Thread(target = test_game)
+    thread = threading.Thread(target = test_game, args=[board_canvas, board, tile_supply])
     thread.start()
     board_canvas.mainloop()
