@@ -12,11 +12,16 @@ import Tile
 import Location
 import GameConstants
 import threading
+import tkinter
+from tkinter import font
+from tkinter import messagebox
 
 class HumanAgent:
 
-    def __init__(self, board_canvas, board, tile_supply, player_index, players):
+    def __init__(self, board_canvas, board, tile_supply, player_index, players,
+        raise_dialog = True):
         """Makes a human agent based off a player who plays on the given board"""
+        self.raise_dialog = raise_dialog
         self.grid = BoardCanvas.GRID_SIZE
         self.gap = BoardCanvas.GRID_GAP
         self.drawn_things = {}
@@ -28,6 +33,13 @@ class HumanAgent:
         self.player_index = player_index
         self.actions_queue = queue.Queue()
         self.is_turn = False
+
+        self.name_id = board_canvas.can.create_text(
+                board_canvas.get_board_width() + gap + grid,
+                self.gap * 1 + self.grid / 2,
+                font=font.Font(family='Helvetica', size=24, weight='bold'),
+                text=Player.get_player_name(players[player_index]),
+                fill=Player.get_player_color(players[player_index]))
 
         self.draw_human_items(self.player)
         board_canvas.add_board_action_listener(self)
@@ -72,6 +84,11 @@ class HumanAgent:
         grid = self.grid
         gap = self.gap
         offy = gap * 3 + grid * 3 / 2
+
+        self.board_canvas.can.itemconfigure(self.name_id,
+                text=Player.get_player_name(player),
+                fill=Player.get_player_color(player))
+
         """Draws a player's items on the screen"""
         def draw_things(offy, draw_method, values, piece_type, x_jump = grid + gap,
                 y_jump = grid + gap, push_x = 0, push_y = 0):
@@ -107,8 +124,8 @@ class HumanAgent:
                     del self.drawn_things[key]
             return offy
 
-        offy = draw_things(offy, lambda x, y, val: board_canvas.add_moveable_rooftop((x, y), Player.get_player_color(self.player)),
-                range(Player.get_held_rooftops(self.player)), Move.ROOFTOP)
+        offy = draw_things(offy, lambda x, y, val: board_canvas.add_moveable_rooftop((x, y), val[:-1]),
+                [Player.get_player_color(self.player) + str(i) for i in range(Player.get_held_rooftops(self.player))], Move.ROOFTOP)
         offy = draw_things(offy, lambda x, y, val: board_canvas.add_moveable_rooftop((x, y), "Neutral"),
                 range(Player.get_extra_rooftops(self.player)), Move.NEUTRAL_ROOFTOP)
         for color in GameConstants.BUILDINGS_COLORS:
@@ -155,11 +172,22 @@ class HumanAgent:
         self.player = self.players[self.player_index]
         self.board_canvas.update_board()
         self.draw_human_items(self.player)
+
+        if num_moves <= 0:
+            return []
+
+        if self.raise_dialog:
+            tkinter.messagebox.showinfo(Player.get_player_name(self.player) + "'s Turn",
+                    Player.get_player_name(self.player) + " can take " + str(num_moves) + " actions")
+
         self.is_turn = True
         while len(moves) < num_moves:
             #print("getting next human move")
             if not Agent.can_make_move(self.board, self.players[self.player_index]):
                 #print("no possible moves found")
+                if self.raise_dialog:
+                    tkinter.messageboxs.showwarning(Player.get_player_name("No Actions",
+                            "You cannot take any more actions this turn"))
                 moves.append(Move.make_move(Player.get_player_name(self.players[self.player_index]), Move.NONE_POSSIBLE))
             #print("waiting for player input")
             image_id, move = self.actions_queue.get()
@@ -196,7 +224,7 @@ if __name__ == "__main__":
         players = [Player.make_player(names[i], 4, colors[i]) for i in range(4)]
         random_agent = Agent.get_random_agent()
         human_agent = HumanAgent(board_canvas, board, tile_supply, 0, players)
-        agents = [human_agent.human_decision] + [random_agent] * 3
+        agents = [human_agent.human_decision] * 2 + [random_agent] * 2
         scores, board, players, tile_supply = Game.play_game(board_canvas, board,
             players, tile_supply, agents)
         human_agent.human_decision(board, 0, players, tile_supply, 0)
