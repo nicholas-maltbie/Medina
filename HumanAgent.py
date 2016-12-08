@@ -146,19 +146,19 @@ class HumanAgent:
         values = [Tile.get_tile_value(tile) for tile in Player.get_tiles_of_type(self.player, Tile.PALACE_TILE)]
         values.sort()
         offy = draw_things(offy, lambda x, y, n:self.board_canvas.add_moveable_image( \
-                self.board_canvas.palace_images[Tile.PALACE_COLORS[n][0]], (x, y), Tile.PALACE_TILE, n), \
+                self.board_canvas.PALACE_IMAGES[Tile.PALACE_COLORS[n][0]], (x, y), Tile.PALACE_TILE, n), \
                 values, Tile.PALACE_TILE, x_jump = grid * 3 / 2 + gap, y_jump = grid * 2 + gap, push_x = grid / 2)
 
         values = [Tile.get_tile_value(tile) for tile in Player.get_tiles_of_type(self.player, Tile.TOWER_TILE)]
         values.sort()
         offy = draw_things(offy, lambda x, y, n:self.board_canvas.add_moveable_image( \
-                self.board_canvas.tower_images[n], (x, y), Tile.TOWER_TILE, n), \
+                self.board_canvas.TOWER_IMAGES[n], (x, y), Tile.TOWER_TILE, n), \
                 values, Tile.TOWER_TILE, x_jump = grid * 3 / 2 + gap, y_jump = grid * 2 + gap, push_x = grid / 2)
 
 
         values = range(len(Player.get_tiles_of_type(self.player, Tile.TEA_TILE)))
         offy = draw_things(offy, lambda x, y, n:self.board_canvas.add_moveable_image( \
-                self.board_canvas.tea_image, (x, y), Tile.TEA_TILE, n), \
+                self.board_canvas.TEA_IMAGE, (x, y), Tile.TEA_TILE, n), \
                 values, Tile.TEA_TILE, x_jump = grid * 3 / 2 + gap, y_jump = grid * 2 + gap, push_x = grid / 2)
 
     def human_decision(self, board, player_index, players, tile_supply, num_moves):
