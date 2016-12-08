@@ -21,10 +21,6 @@ GRID_GAP = 8
 """Size of walls in terms of grid_sizes"""
 wallSize = 1
 
-#Load different images
-BUILDING_IMAGES = {}
-WALL_IMAGES = []
-
 def make_edge(loc1, loc2):
     """Makes and edge data type"""
     return (loc1, loc2)
@@ -38,6 +34,18 @@ def get_second_point(edge):
     return edge[1]
 
 class BoardCanvas(tkinter.Tk):
+    #Load different images
+    BUILDING_IMAGES = {}
+    TOWER_IMAGES = {}
+    PALACE_IMAGES = {}
+    ROOFTOP_IMAGES = {}
+    WALL_IMAGES = []
+    STABLE_IMAGE = None
+    TOWER_IMAGE = None
+    TEA_IMAGE = None
+    WELL_IMAGE = None
+    MERCHANT_IMAGE = None
+
     def get_board_width(self):
         """Gets the width of the board from tower to tower"""
         return self.board_width
@@ -48,6 +56,18 @@ class BoardCanvas(tkinter.Tk):
 
     def __init__(self, board, tile_supply, additional_x=0, additional_y=0):
         tkinter.Tk.__init__(self)
+
+        self.BUILDING_IMAGES = {}
+        self.PALACE_IMAGES = {}
+        self.TOWER_IMAGES = {}
+        self.ROOFTOP_IMAGES = {}
+        self.WALL_IMAGES = []
+        self.STABLE_IMAGE = None
+        self.TOWER_IMAGE = None
+        self.TEA_IMAGE = None
+        self.WELL_IMAGE = None
+        self.MERCHANT_IMAGE = None
+
         self.board_width = GRID_SIZE * (Board.get_columns(board) + 2*wallSize + 6) + GRID_GAP * (Board.get_columns(board) + 2*wallSize + 5)
         self.board_height = GRID_SIZE * (Board.get_rows(board) + 2*wallSize + 6) + GRID_GAP * (Board.get_rows(board) + 2*wallSize + 4)
         self.can = tkinter.Canvas(width=self.board_width + additional_x, height=self.board_height + additional_y)
@@ -65,25 +85,26 @@ class BoardCanvas(tkinter.Tk):
         self.drawn_palace_tiles = {}
         self.drawn_tea_tiles = {}
 
-        self.tower_image = tkinter.PhotoImage(file="Assets/Tower.gif")
-        self.tower_image = self.tower_image.subsample(self.tower_image.width() // GRID_SIZE, self.tower_image.height() // GRID_SIZE)
-        self.well_image = tkinter.PhotoImage(file = "Assets/Well.gif")
-        self.well_image = self.well_image.subsample(self.well_image.width() // GRID_SIZE, self.well_image.height() // GRID_SIZE)
-        self.merchant_image = None
+        if self.TOWER_IMAGE == None:
+            self.TOWER_IMAGE = tkinter.PhotoImage(file="Assets/Tower.gif")
+            self.TOWER_IMAGE = self.TOWER_IMAGE.subsample(self.TOWER_IMAGE.width() // GRID_SIZE, self.TOWER_IMAGE.height() // GRID_SIZE)
+        if self.WELL_IMAGE == None:
+            self.WELL_IMAGE = tkinter.PhotoImage(file = "Assets/Well.gif")
+            self.WELL_IMAGE = self.WELL_IMAGE.subsample(self.WELL_IMAGE.width() // GRID_SIZE, self.WELL_IMAGE.height() // GRID_SIZE)
 
-        if BUILDING_IMAGES == {}:
+        if self.BUILDING_IMAGES == {}:
             for color in BUILDINGS_COLORS:
                 img = tkinter.PhotoImage(file="Assets/Building_" + color[0] + ".gif")
-                BUILDING_IMAGES[color] = img.subsample(img.width() // GRID_SIZE, img.height() // GRID_SIZE)
+                self.BUILDING_IMAGES[color] = img.subsample(img.width() // GRID_SIZE, img.height() // GRID_SIZE)
             img = tkinter.PhotoImage(file="Assets/Wall_North.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (WALL_WIDTH)))
+            self.WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (WALL_WIDTH)))
             img = tkinter.PhotoImage(file="Assets/Wall_South.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (WALL_WIDTH)))
+            self.WALL_IMAGES.append(img.subsample(img.width() // (GRID_SIZE + GRID_GAP + 1), img.height() // (WALL_WIDTH)))
 
             img = tkinter.PhotoImage(file="Assets/Wall_East.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 1)))
+            self.WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 1)))
             img = tkinter.PhotoImage(file="Assets/Wall_West.gif")
-            WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 1)))
+            self.WALL_IMAGES.append(img.subsample(img.width() // (WALL_WIDTH), img.height() // (GRID_SIZE + GRID_GAP + 1)))
 
         rows = Board.get_rows(self.board)
         columns = Board.get_columns(self.board)
@@ -120,50 +141,52 @@ class BoardCanvas(tkinter.Tk):
                 (Location.make_location(self.rows, self.columns), Location.make_location(self.rows + 3, self.columns + 3))]
 
         board = self.board
-        if self.merchant_image == None:
-            self.merchant_image = tkinter.PhotoImage(file = "Assets/Merchant.gif")
-            self.merchant_image = self.merchant_image.subsample(self.merchant_image.width() // GRID_SIZE, self.merchant_image.height() // GRID_SIZE)
+        if self.MERCHANT_IMAGE == None:
+            self.MERCHANT_IMAGE = tkinter.PhotoImage(file = "Assets/Merchant.gif")
+            self.MERCHANT_IMAGE = self.MERCHANT_IMAGE.subsample(self.MERCHANT_IMAGE.width() // GRID_SIZE, self.MERCHANT_IMAGE.height() // GRID_SIZE)
 
         board = self.board
         self.elements = [[None] * Board.get_columns(board)] * Board.get_rows(board);
 
         self.towers = []
         for i in range(1, 5):
-            self.can.create_image(self.get_tower_pixels(i), image = self.tower_image)
+            self.can.create_image(self.get_tower_pixels(i), image = self.TOWER_IMAGE)
         well = Board.get_well(self.board)
-        self.well = self.can.create_image(self.get_board_pixels(well), image = self.well_image)
+        self.well = self.can.create_image(self.get_board_pixels(well), image = self.WELL_IMAGE)
         self.place_piece(well, "WELL", self.well)
         self.add_merchant_to_grid(Market.get_active_market_street(Board.get_market(self.board))[0])
 
-        self.stable_image = tkinter.PhotoImage(file = "Assets/Stable.gif")
-        self.stable_image = self.stable_image.subsample(self.stable_image.width() // GRID_SIZE, self.stable_image.height() // GRID_SIZE)
+        if self.STABLE_IMAGE == None:
+            self.STABLE_IMAGE = tkinter.PhotoImage(file = "Assets/Stable.gif")
+            self.STABLE_IMAGE = self.STABLE_IMAGE.subsample(self.STABLE_IMAGE.width() // GRID_SIZE, self.STABLE_IMAGE.height() // GRID_SIZE)
 
-        self.rooftop_images = {}
-        for color in PLAYER_COLORS:
-            self.rooftop_images[color[0]] = tkinter.PhotoImage(file = "Assets/Rooftop_" + color[0] + ".gif")
-            self.rooftop_images[color[0]] = self.rooftop_images[color[0]].subsample( \
-                    self.rooftop_images[color[0]].width() // GRID_SIZE, self.rooftop_images[color[0]].height() // GRID_SIZE)
+        if self.ROOFTOP_IMAGES == {}:
+            for color in PLAYER_COLORS:
+                self.ROOFTOP_IMAGES[color[0]] = tkinter.PhotoImage(file = "Assets/Rooftop_" + color[0] + ".gif")
+                self.ROOFTOP_IMAGES[color[0]] = self.ROOFTOP_IMAGES[color[0]].subsample( \
+                        self.ROOFTOP_IMAGES[color[0]].width() // GRID_SIZE, self.ROOFTOP_IMAGES[color[0]].height() // GRID_SIZE)
 
-        self.palace_images = {}
-        for color in BUILDINGS_COLORS:
-            self.palace_images[color[0]] = tkinter.PhotoImage(file = "Assets/Palace_Tile_" + color[0]  + ".gif")
-            self.palace_images[color[0]] = self.palace_images[color[0]].subsample( \
-                    self.palace_images[color[0]].width() // (GRID_SIZE * 2), self.palace_images[color[0]].height() // (GRID_SIZE * 2))
+        if self.PALACE_IMAGES == {}:
+            for color in BUILDINGS_COLORS:
+                self.PALACE_IMAGES[color[0]] = tkinter.PhotoImage(file = "Assets/Palace_Tile_" + color[0]  + ".gif")
+                self.PALACE_IMAGES[color[0]] = self.PALACE_IMAGES[color[0]].subsample( \
+                        self.PALACE_IMAGES[color[0]].width() // (GRID_SIZE * 2), self.PALACE_IMAGES[color[0]].height() // (GRID_SIZE * 2))
 
-        self.tower_images = {}
-        for num in range(1, 5):
-            self.tower_images[num] = tkinter.PhotoImage(file = "Assets/Tower_Tile_" + str(num)  + ".gif")
-            self.tower_images[num] = self.tower_images[num].subsample( \
-                    self.tower_images[num].width() // (GRID_SIZE * 2), self.tower_images[num].height() // (GRID_SIZE * 2))
+        if self.TOWER_IMAGES == {}:
+            for num in range(1, 5):
+                self.TOWER_IMAGES[num] = tkinter.PhotoImage(file = "Assets/Tower_Tile_" + str(num)  + ".gif")
+                self.TOWER_IMAGES[num] = self.TOWER_IMAGES[num].subsample( \
+                        self.TOWER_IMAGES[num].width() // (GRID_SIZE * 2), self.TOWER_IMAGES[num].height() // (GRID_SIZE * 2))
 
-        self.tea_image = tkinter.PhotoImage(file = "Assets/Tea_Tile.gif")
-        self.tea_image = self.tea_image.subsample(self.tea_image.width() // (GRID_SIZE * 2), self.tea_image.height() // (GRID_SIZE * 2))
+        if self.TEA_IMAGE == None:
+            self.TEA_IMAGE = tkinter.PhotoImage(file = "Assets/Tea_Tile.gif")
+            self.TEA_IMAGE = self.TEA_IMAGE.subsample(self.TEA_IMAGE.width() // (GRID_SIZE * 2), self.TEA_IMAGE.height() // (GRID_SIZE * 2))
 
         self.update_board()
 
     def draw_rooftop(self, loc, color):
         """Draws a roofotp and returns the image ID"""
-        return self.can.create_image(self.get_board_pixels(loc), image=self.rooftop_images[color])
+        return self.can.create_image(self.get_board_pixels(loc), image=self.ROOFTOP_IMAGES[color])
 
     def draw_edge(self, edge, color):
         """Draws an edge and returns the image ID"""
@@ -232,7 +255,7 @@ class BoardCanvas(tkinter.Tk):
 
     def add_merchant_to_grid(self, location):
         """Adds a merchant to a specified location on the grid"""
-        image_id = self.can.create_image(self.get_board_pixels(location), image= self.merchant_image);
+        image_id = self.can.create_image(self.get_board_pixels(location), image= self.MERCHANT_IMAGE);
         self.place_piece(location, MERCHANT, image_id);
         return image_id
 
@@ -243,13 +266,13 @@ class BoardCanvas(tkinter.Tk):
         or leftmost wall."""
         image_id = -1;
         if side == 'N':
-            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[0])
+            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=self.WALL_IMAGES[0])
         elif side == 'S':
-            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[1])
+            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=self.WALL_IMAGES[1])
         elif side == 'E':
-            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[2])
+            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=self.WALL_IMAGES[2])
         elif side == 'W':
-            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=WALL_IMAGES[3])
+            image_id = self.can.create_image(self.get_wall_pixels(side, index), image=self.WALL_IMAGES[3])
         else:
             return;
         self.place_wall(side, index, image_id)
@@ -265,13 +288,13 @@ class BoardCanvas(tkinter.Tk):
 
     def add_building_to_grid(self, color, location):
         """Adds a bulding graphic to the board at a specified location"""
-        image_id = self.can.create_image(self.get_board_pixels(location), image=BUILDING_IMAGES[color]);
+        image_id = self.can.create_image(self.get_board_pixels(location), image=self.BUILDING_IMAGES[color]);
         self.place_piece(location, BUILDING, image_id)
         return image_id
 
     def add_stable_to_grid(self, location):
         """Adds a stable graphic to the board at the specific location"""
-        image_id = self.can.create_image(self.get_board_pixels(location), image=self.stable_image)
+        image_id = self.can.create_image(self.get_board_pixels(location), image=self.STABLE_IMAGE)
         self.place_piece(location, STABLE, image_id)
         return image_id
 
@@ -350,7 +373,7 @@ class BoardCanvas(tkinter.Tk):
     def check_well(self):
         """Checks if the well is placed in the correct spot"""
         well = Board.get_well(self.board)
-        self.well = self.can.create_image(self.get_board_pixels(well), image = self.well_image)
+        self.well = self.can.create_image(self.get_board_pixels(well), image = self.WELL_IMAGE)
         self.place_piece(well, "WELL", self.well)
 
     def update_board(self):
@@ -501,7 +524,7 @@ class BoardCanvas(tkinter.Tk):
         x2, y2 = self.get_board_pixels(loc2)
         x_center = (x1 + x2) / 2
         y_center = (y1 + y2) / 2 + GRID_GAP * (tea_num + 1) + GRID_SIZE * tea_num
-        return self.can.create_image((x_center, y_center), image= self.tea_image)
+        return self.can.create_image((x_center, y_center), image= self.TEA_IMAGE)
 
     def draw_palace_tile(self, palace_num):
         """Draws a palace tile and returns the image id"""
@@ -511,12 +534,12 @@ class BoardCanvas(tkinter.Tk):
         x_temp, y2 = self.get_board_pixels(Location.make_location(-1, 0))
         x_center = x1 + GRID_SIZE * 2 * (palace_num - 1) + GRID_SIZE * 3 / 2 + GRID_GAP * (palace_num)
         y_center = (y1 + y2) / 2
-        return self.can.create_image((x_center, y_center), image = self.palace_images[Tile.PALACE_COLORS[palace_num][0]])
+        return self.can.create_image((x_center, y_center), image = self.PALACE_IMAGES[Tile.PALACE_COLORS[palace_num][0]])
 
     def draw_tower_tile(self, tower_num):
         """Draws a tower tile and returns the image id"""
         return self.can.create_image(self.get_tower_tile_center(tower_num),
-                image = self.tower_images[tower_num])
+                image = self.TOWER_IMAGES[tower_num])
 
     def draw_tower_tile_merchant(self, tower_num, merchant_num):
         """Draws merchants for a tower tile"""
@@ -529,7 +552,7 @@ class BoardCanvas(tkinter.Tk):
             y -= (GRID_SIZE + GRID_GAP) / 2
         else:
             y += (GRID_SIZE + GRID_GAP) / 2
-        return self.can.create_image((x, y), image = self.merchant_image)
+        return self.can.create_image((x, y), image = self.MERCHANT_IMAGE)
 
     def get_tower_tile_center(self, tower_num):
         """Gets the center of a tower tile location"""
@@ -676,31 +699,31 @@ class BoardCanvas(tkinter.Tk):
 
     def add_moveable_building(self, color, coords):
         """Adds a moveable building of a specified color at an x and y"""
-        image_id = self.can.create_image(coords, image=BUILDING_IMAGES[color], tags="token")
+        image_id = self.can.create_image(coords, image=self.BUILDING_IMAGES[color], tags="token")
         self.moveable_items[image_id] = (BUILDING, color)
         return image_id
 
     def add_moveable_stable(self, coords):
         """Adds a moveable stable at an x and y"""
-        image_id = self.can.create_image(coords, image=self.stable_image, tags="token")
+        image_id = self.can.create_image(coords, image=self.STABLE_IMAGE, tags="token")
         self.moveable_items[image_id] = (STABLE, None)
         return image_id
 
     def add_moveable_wall(self, coords):
         """Adds a moveable wall at an x and y"""
-        image_id = self.can.create_image(coords, image=WALL_IMAGES[0], tags="token")
+        image_id = self.can.create_image(coords, image=self.WALL_IMAGES[0], tags="token")
         self.moveable_items[image_id] = (WALL, 'N')
         return image_id
 
     def add_moveable_merchant(self, coords):
         """Adds a moveable merchant to an x and y"""
-        image_id = self.can.create_image(coords, image=self.merchant_image, tags="token")
+        image_id = self.can.create_image(coords, image=self.MERCHANT_IMAGE, tags="token")
         self.moveable_items[image_id] = (MERCHANT, None)
         return image_id
 
     def add_moveable_rooftop(self, coords, color):
         """Adds a moveable rooftop to the board"""
-        image_id = self.can.create_image(coords, image=self.rooftop_images[color[0]], tags="token")
+        image_id = self.can.create_image(coords, image=self.ROOFTOP_IMAGES[color[0]], tags="token")
         self.moveable_items[image_id] = (ROOFTOP, color)
         return image_id
 

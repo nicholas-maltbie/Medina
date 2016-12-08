@@ -34,6 +34,9 @@ class HumanAgent:
         self.actions_queue = queue.Queue()
         self.is_turn = False
 
+        grid = BoardCanvas.GRID_SIZE
+        gap = BoardCanvas.GRID_GAP
+
         self.name_id = board_canvas.can.create_text(
                 board_canvas.get_board_width() + gap + grid,
                 self.gap * 1 + self.grid / 2,
@@ -96,7 +99,7 @@ class HumanAgent:
             drawn = set()
             offy += push_y
             if values:
-                offx = board_canvas.get_board_width() + gap + grid // 2 + push_x
+                offx = self.board_canvas.get_board_width() + gap + grid // 2 + push_x
                 for index in range(len(values)):
                     val = values[index]
                     key = (piece_type, val)
@@ -114,7 +117,7 @@ class HumanAgent:
                         self.drawn_things[key] = draw_method(offx, offy, val)
                     offx += x_jump
                     if (index + 1) % 6 == 0 and index != len(values) - 1:
-                        offx = board_canvas.get_board_width() + gap + grid // 2 + push_y
+                        offx = self.board_canvas.get_board_width() + gap + grid // 2 + push_y
                         offy += y_jump
                 offy += y_jump
             for key in list(self.drawn_things.keys()):
@@ -124,18 +127,18 @@ class HumanAgent:
                     del self.drawn_things[key]
             return offy
 
-        offy = draw_things(offy, lambda x, y, val: board_canvas.add_moveable_rooftop((x, y), val[:-1]),
+        offy = draw_things(offy, lambda x, y, val: self.board_canvas.add_moveable_rooftop((x, y), val[:-1]),
                 [Player.get_player_color(self.player) + str(i) for i in range(Player.get_held_rooftops(self.player))], Move.ROOFTOP)
-        offy = draw_things(offy, lambda x, y, val: board_canvas.add_moveable_rooftop((x, y), "Neutral"),
+        offy = draw_things(offy, lambda x, y, val: self.board_canvas.add_moveable_rooftop((x, y), "Neutral"),
                 range(Player.get_extra_rooftops(self.player)), Move.NEUTRAL_ROOFTOP)
         for color in GameConstants.BUILDINGS_COLORS:
-            offy = draw_things(offy, lambda x, y, val: board_canvas.add_moveable_building(color, (x,y)),
+            offy = draw_things(offy, lambda x, y, val: self.board_canvas.add_moveable_building(color, (x,y)),
                     range(Player.get_held_buildings_of_color(self.player, color)), color)
-        offy = draw_things(offy, lambda x, y, val: board_canvas.add_moveable_stable((x, y)),
+        offy = draw_things(offy, lambda x, y, val: self.board_canvas.add_moveable_stable((x, y)),
                 range(Player.get_num_stables(self.player)), Move.STABLE)
-        offy = draw_things(offy, lambda x, y, val: board_canvas.add_moveable_merchant((x, y)),
+        offy = draw_things(offy, lambda x, y, val: self.board_canvas.add_moveable_merchant((x, y)),
                 range(Player.get_held_merchants(self.player)), Move.MERCHANT)
-        offy = draw_things(offy, lambda x, y, val: board_canvas.add_moveable_wall((x, y)),
+        offy = draw_things(offy, lambda x, y, val: self.board_canvas.add_moveable_wall((x, y)),
                 range(Player.get_held_walls(self.player)), Move.WALL, x_jump = grid + gap * 2)
 
         offy += grid / 2 + gap
