@@ -7,8 +7,9 @@ all types of moves as there are many similar moves of the same type such as
 placing buildings or stables).
 
 A agent only needs to be the following function:
-make_decision(board, current, players, tile_supply, num_moves)
+make_decision(board, player_index, players, tile_supply, num_moves)
     - board is the game board
+    - player_index is the index of the current player
     - current is the player making the move (index)
     - players are the players in the game
     - tile_supply the game's tile supply
