@@ -161,7 +161,7 @@ class HumanAgent:
                 self.board_canvas.TEA_IMAGE, (x, y), Tile.TEA_TILE, n), \
                 values, Tile.TEA_TILE, x_jump = grid * 3 / 2 + gap, y_jump = grid * 2 + gap, push_x = grid / 2)
 
-    def human_decision(self, board, player_index, players, tile_supply, num_moves):
+    def human_decision(self, board, player_index, players, tile_supply, num_moves, mutate):
         moves = []
         self.board = board
         self.players = players
@@ -197,8 +197,11 @@ class HumanAgent:
             image_id, move = self.actions_queue.get()
             moves.append(move)
             self.board_canvas.remove_moveable_item(image_id)
-            self.board, self.players, self.tile_supply = Agent.apply_move(move,
-                    self.board, self.tile_supply, self.player_index, self.players)
+            if not mutate:
+                self.board, self.players, self.tile_supply = Agent.apply_move(move,
+                        self.board, self.tile_supply, self.player_index, self.players)
+            else:
+                Agent.mutate_move(move, self.board, self.tile_supply, self.player_index, self.players)
             self.board_canvas.board = self.board
             self.board_canvas.tile_supply = self.tile_supply
             self.board_canvas.player = self.players[self.player_index]

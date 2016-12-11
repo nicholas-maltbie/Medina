@@ -7,13 +7,15 @@ all types of moves as there are many similar moves of the same type such as
 placing buildings or stables).
 
 A agent only needs to be the following function:
-make_decision(board, player_index, players, tile_supply, num_moves)
+make_decision(board, player_index, players, tile_supply, num_moves, mutate)
     - board is the game board
     - player_index is the index of the current player
     - current is the player making the move (index)
     - players are the players in the game
     - tile_supply the game's tile supply
     - num_moves is the number of moves the agent can make
+    - mutate is a boolean denoting whether the AI is allowed the change the
+        original board
 
 This function must return a list of moves that the player makes."""
 
@@ -134,9 +136,8 @@ def is_valid_move(move, board, player):
             return Player.get_held_walls(player) > 0 and move_loc in Tower.get_possible_wall_additions(Board.get_towers(board))
         return False
 
-def apply_move(move, board, tile_supply, player_index, players):
-    """Applys a given move to a board and returns a new board with the move
-    applyed to it. The original board remains unchanged."""
+def mutate_move(move, board, tile_supply, player_index, players):
+    """Applys a move to a given board state and mutates the original board state"""
     def get_tile_from_supply(tile_supply, tile_type, value=0):
         """Gets a tile from the supply"""
         for i in range(len(tile_supply)):
@@ -202,10 +203,6 @@ def apply_move(move, board, tile_supply, player_index, players):
             if is_adj_to_tower(num):
                 connected.append(num)
         return connected
-
-    board = Board.clone_board(board)
-    tile_supply = [Tile.clone_tile(tile) for tile in tile_supply]
-    players = [Player.clone_player(player) for player in players]
     player = players[player_index]
     if Move.get_move_type(move) == Move.NONE_POSSIBLE:
         pass
@@ -323,18 +320,30 @@ def apply_move(move, board, tile_supply, player_index, players):
 
     return board, players, tile_supply
 
-def get_agent_moves(agent, board, current, tile_supply, players, num_moves=2):
+def apply_move(move, board, tile_supply, player_index, players):
+    """Applys a given move to a board and returns a new board with the move
+    applyed to it. The original board remains unchanged."""
+    board = Board.clone_board(board)
+    tile_supply = [Tile.clone_tile(tile) for tile in tile_supply]
+    players = [Player.clone_player(player) for player in players]
+    player = players[player_index]
+    return mutate_move(move, board, tile_supply, player_index, players)
+
+def get_agent_moves(agent, board, current, tile_supply, players, num_moves=2, mutate=False):
     """Gets the moves made by an agent for his/her/it's turn."""
-    return agent(board, current, players, tile_supply, num_moves)
+    return agent(board, current, players, tile_supply, num_moves, mutate)
 
 def get_random_agent():
     """A random agent for testing the functionality of the agent."""
     import random
-    def make_moves(board, player_index, players, tile_supply, num_moves):
+    def make_moves(board, player_index, players, tile_supply, num_moves, mutate):
         moves = []
         for i in range(num_moves):
             move = random.choice(get_all_possible_moves(players[player_index], board))
-            board, players, tile_supply = apply_move(move, board, tile_supply, player_index, players)
+            if not mutate:
+                board, players, tile_supply = apply_move(move, board, tile_supply, player_index, players)
+            else:
+                mutate_move(move, board, tile_supply, player_index, players)
             moves.append(move)
         return moves;
     return make_moves;
